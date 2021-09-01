@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="container-cards">
-        <CardVue />
+        <CardVue @openModal="openModal" />
       </div>
       <!-- Not Found -->
       <!-- <NotFoundVue /> -->
@@ -45,6 +45,7 @@
       v-show="!quitarModal"
       class="fondo-oscuro animate__animated animate__bounceInRight"
       @close="toggleModal"
+      @openModal="openModal"
     />
   </body>
 </template>
@@ -59,7 +60,7 @@ export default {
   name: "Home",
   data(){
     return{
-      quitarModal: false
+      quitarModal: true
     }
   },
   components: {
@@ -71,6 +72,18 @@ export default {
     toggleModal() {
       this.quitarModal = !this.quitarModal;
     },
+    /**
+     * openModal() : void
+     * Open the Modal even thougn it's already open.
+     */
+    openModal(){
+      // Cerrar el modal brevemente.
+      this.quitarModal = true;
+      // Despues de medio segundo, abrirlo.
+      setTimeout(() => {
+        this.quitarModal = false;
+      }, 500);
+    }
   }
 };
 </script>

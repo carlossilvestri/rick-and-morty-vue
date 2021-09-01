@@ -5,11 +5,14 @@
         <div class="container-elements-tarjeta diferencias-1">
           <div class="flex-elemts">
             <div class="cont-img-background">
+              <div class="cont-x-icon" @click="close()">
+                <img src="@/assets/img/modal/x-icon.svg?data" />
+              </div>
               <img src="@/assets/img/modal/bg.jpg" alt="Img Background" />
             </div>
             <div class="cont-img-main">
               <img
-                src="@/assets/img/modal/bg.jpg"
+                src="@/assets/img/modal/beth-test.png"
                 alt="Img Main Character"
                 class="img-character"
               />
@@ -29,15 +32,27 @@
               </div>
               <div class="cont-info-balls">
                 <div class="cont-ball">
-                  <p class="soft-text"><span><img src="@/assets/img/modal/info.jpg" alt="Info"></span>Gender:</p>
+                  <p class="soft-text">
+                    <span
+                      ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
+                    >Gender:
+                  </p>
                   <h3 class="strong-text">S01E01</h3>
                 </div>
                 <div class="cont-ball">
-                  <p class="soft-text"><span><img src="@/assets/img/modal/info.jpg" alt="Info"></span>Origin:</p>
+                  <p class="soft-text">
+                    <span
+                      ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
+                    >Origin:
+                  </p>
                   <h3 class="strong-text">S01E01</h3>
                 </div>
                 <div class="cont-ball">
-                  <p class="soft-text"><span><img src="@/assets/img/modal/info.jpg" alt="Info"></span>Type:</p>
+                  <p class="soft-text">
+                    <span
+                      ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
+                    >Type:
+                  </p>
                   <h3 class="strong-text">S01E01</h3>
                 </div>
               </div>
@@ -64,6 +79,20 @@
                 </div>
               </div>
             </div>
+            <div class="cont-info">
+              <div class="cont-title-info">
+                <h4>Personajes interesantes</h4>
+              </div>
+              <div class="cont-cards-modal">
+                <CardVue @openModal="openModal" />
+                <CardVue @openModal="openModal" />
+                <CardVue @openModal="openModal" />
+                <CardVue @openModal="openModal" />
+              </div>
+              <div class="cont-btn-share">
+                <button class="btn-1">Compartir personaje</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -72,18 +101,31 @@
 </template>
 
 <script>
+import CardVue from "@/components/Card.vue";
 export default {
   name: "Modal",
+  data(){
+    return{
+      SVGXIcon: require('@/assets/img/modal/x-icon.svg?data')
+    }
+  },
   methods: {
     close() {
       this.$emit("close");
     },
+    openModal() {
+      this.$emit("openModal");
+    },
+  },
+  components: {
+    CardVue
   },
 };
 </script>
 
 <style lang="scss">
 @import "~@/scss/_variables.scss";
+
 .cont-modal-main {
   height: 100vh;
   display: flex;
@@ -103,22 +145,54 @@ export default {
       margin: 25px 10px;
     }
     .container-elements-tarjeta {
-      height: 75%;
+      // height: 75%;
+      height: 531px;
+      width: 718px;
+      overflow-y: auto;
+      // max-width: 80%;
+      // margin: 25px auto;
+      text-align: center;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      &::-webkit-scrollbar {
+        width: 0px;
+        height: 12px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #e5e5e5;
+        border-radius: 10px;
+        height: 0;
+        width: 0;
+        @media (max-width: 425px) {
+          background: transparent;
+        }
+      }
       .flex-elemts {
+        position: relative;
         .cont-img-background {
+          height: 208px;
+          width: 718px;
           img {
-            max-width: 698px;
+            width: 100%;
+          }
+          .cont-x-icon {
+            width: 29px;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
           }
         }
         .cont-relleno {
           background-color: #f2f2f2;
-          max-width: 698px;
-          height: 130px;
+          height: 179px;
         }
         .cont-img-main {
           position: absolute;
-          top: 34%;
-          right: 45%;
+          top: 11%;
+          right: 39%;
           max-width: 200px;
           .img-character {
             border: 4px solid #fffbfb;
@@ -153,6 +227,33 @@ export default {
               margin: 20px 0;
             }
           }
+          .cont-cards-modal {
+            display: flex;
+            overflow-y: auto;
+            text-align: center;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            &::-webkit-scrollbar {
+              width: 10px;
+              height: 10px;
+            }
+            &::-webkit-scrollbar-thumb {
+              background: #e5e5e5;
+              border-radius: 10px;
+              // height: 0;
+              // width: 0;
+              @media (max-width: 425px) {
+                background: transparent;
+              }
+            }
+          }
+          .cont-btn-share {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px;
+          }
         }
         .cont-info-balls {
           display: flex;
@@ -170,8 +271,8 @@ export default {
             .soft-text {
               font-size: 11px;
               margin: 0;
-              span{
-                  margin-right: 4px;
+              span {
+                margin-right: 4px;
               }
             }
             .strong-text {

@@ -12,7 +12,7 @@
         class="star-inside-card"
       />
     </div>
-    <div class="cont-card-text">
+    <div class="cont-card-text" @click="openModal">
       <p class="soft-text-1"><span class="alive">●</span> Alive - Human</p>
       <h5 class="name-text">Morty Smith</h5>
       <p class="soft-text-2">Last known location:</p>
@@ -26,6 +26,11 @@
 <script>
 export default {
   name: "Card",
+  methods:{
+    openModal() {
+      this.$emit("openModal");
+    },
+  }
 };
 </script>
 
@@ -41,8 +46,7 @@ export default {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
   min-height: 140px;
   margin: 0 10px 10px 10px;
-  max-width: 380px;
-  width: 100%;
+  min-width: 380px;
   display: flex;
   justify-content: flex-start;
   .cont-img-card {
@@ -64,6 +68,8 @@ export default {
     font-weight: normal;
     line-height: 12px;
     color: #000000;
+    text-align: left;
+    cursor: pointer;
     .soft-text-1 {
       font-weight: normal;
       font-size: 10px;
