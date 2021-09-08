@@ -1,36 +1,47 @@
 <template>
-  <div class="cont-card">
-    <div class="cont-img-card">
-      <img
-        src="@/assets/img/home/morty.jpg"
-        alt="Morty"
-        class="character-show"
-      />
-      <img
-        src="@/assets/img/home/no-active-star.svg"
-        alt="Star"
-        class="star-inside-card"
-      />
+  <div>
+    <div class="cont-card" v-if="info">
+      <div class="cont-img-card">
+        <img
+          :src="info.image"
+          alt="Morty"
+          class="character-show"
+        />
+        <img
+          src="@/assets/img/home/no-active-star.svg"
+          alt="Star"
+          class="star-inside-card"
+        />
+      </div>
+      <div class="cont-card-text" @click="openModal">
+        <p class="soft-text-1">
+          <span :class="{'alive': info.status === 'Alive', 'death': info.status === 'Dead'}">●</span> {{ info.status }} - {{ info.species }}
+        </p>
+        <h5 class="name-text">{{ info.name }}</h5>
+        <p class="soft-text-2">Last known location:</p>
+        <p class="intermediate-text-1 margin">{{ info.location.name }}</p>
+        <p class="soft-text-2">First seen in:</p>
+        <p class="intermediate-text-1">Never Ricking Morty</p>
+      </div>
     </div>
-    <div class="cont-card-text" @click="openModal">
-      <p class="soft-text-1"><span class="alive">●</span> Alive - Human</p>
-      <h5 class="name-text">Morty Smith</h5>
-      <p class="soft-text-2">Last known location:</p>
-      <p class="intermediate-text-1 margin">Story Train</p>
-      <p class="soft-text-2">First seen in:</p>
-      <p class="intermediate-text-1">Never Ricking Morty</p>
-    </div>
+    <SpinnerVue v-else/>
   </div>
 </template>
 
 <script>
+import SpinnerVue from "./Spinner.vue";
+
 export default {
   name: "Card",
-  methods:{
+  props: ["info"],
+  components: {
+    SpinnerVue,
+  },
+  methods: {
     openModal() {
       this.$emit("openModal");
     },
-  }
+  },
 };
 </script>
 
@@ -46,9 +57,12 @@ export default {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
   min-height: 140px;
   margin: 0 10px 10px 10px;
-  min-width: 380px;
   display: flex;
   justify-content: flex-start;
+  width: 95vw;
+  @media (min-width: 420px) {
+    width: 380px;
+  }
   .cont-img-card {
     .character-show {
       max-width: 140px;
@@ -75,6 +89,9 @@ export default {
       font-size: 10px;
       color: #4f4f4f;
       margin: 1px 0;
+      span{
+        font-size: 15px;
+      }
     }
     .name-text {
       font-weight: normal;

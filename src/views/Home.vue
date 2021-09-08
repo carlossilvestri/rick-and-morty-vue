@@ -35,14 +35,22 @@
         </div>
       </div>
       <div class="container-cards">
-        <CardVue @openModal="openModal" />
+        <template v-if="results">
+          <CardVue
+            @openModal="openModal"
+            :info="character"
+            v-for="(character, index) in charactersArray"
+            v-bind:key="index"
+          />
+        </template>
+        <SpinnerVue v-if="loading.loadingCharactersAtFirst || loading.loadingOtherCharacters" />
       </div>
       <!-- Not Found -->
-      <!-- <NotFoundVue /> -->
+      <no-results v-if="!loading.loadingAtLeastSomething && !results" />
     </div>
     <!-- Modal -->
     <ModalVue
-      v-show="!quitarModal"
+      v-show="!noModal"
       class="fondo-oscuro animate__animated animate__bounceInRight"
       @close="toggleModal"
       @openModal="openModal"
@@ -55,36 +63,129 @@ import "animate.css";
 import CardVue from "@/components/Card.vue";
 import BarVue from "@/components/Bar.vue";
 import ModalVue from "@/components/Modal.vue";
+import clienteAxios from "@/config/axios";
+import SpinnerVue from "@/components/Spinner.vue";
+import NotFoundVue from "@/components/NotFound.vue";
 
 export default {
   name: "Home",
-  data(){
-    return{
-      quitarModal: true
-    }
+  data() {
+    return {
+      noModal: true,
+      charactersArray: [],
+      loading: {
+        loadingOtherCharacters: true,
+        loadingCharactersAtFirst: true,
+        loadingAtLeastSomething: true,
+      },
+      results: false,
+      visibility: true,
+      first: false,
+      empty: false,
+      page: 1,
+    };
   },
   components: {
     CardVue,
     BarVue,
-    ModalVue
+    ModalVue,
+    SpinnerVue,
+    "no-results": NotFoundVue,
+  },
+  computed: {
+    characters() {
+      return this.$store.state.characters;
+    },
   },
   methods: {
     toggleModal() {
-      this.quitarModal = !this.quitarModal;
+      this.noModal = !this.noModal;
     },
     /**
      * openModal() : void
      * Open the Modal even thougn it's already open.
      */
-    openModal(){
+    openModal() {
       // Cerrar el modal brevemente.
-      this.quitarModal = true;
-      // Despues de medio segundo, abrirlo.
+      this.noModal = true;
+      // After 0.5 sec open the modal.
       setTimeout(() => {
-        this.quitarModal = false;
+        this.noModal = false;
       }, 500);
-    }
-  }
+    },
+    async loadCharacters() {
+      try {
+        this.loading.loadingCharactersAtFirst = true;
+        this.loading.loadingOtherCharacters = false;
+        this.loading.loadingAtLeastSomething = true;
+        const res = await clienteAxios.get("/character/?page=0");
+        const characters = res.data.results;
+        this.charactersArray = characters;
+        this.results = true;
+        console.log("characters.length ", characters.length);
+        if (characters.length === 20) {
+          this.page++;
+        }
+        console.log("this.charactersArray ", this.charactersArray);
+      } catch (error) {
+        console.log("error ", error);
+        this.results = false;
+      } finally {
+        this.loading.loadingCharactersAtFirst = false;
+        this.loading.loadingOtherCharacters = false;
+        this.loading.loadingAtLeastSomething = false;
+      }
+    },
+    /**
+     * Tiene paginacion, ya que acumula los personajes.
+     */
+    async loadOtherCharacters() {
+      try {
+        this.loading.loadingOtherCharacters = true;
+        this.loading.loadingCharactersAtFirst = false;
+        this.loading.loadingAtLeastSomething = true;
+        this.page++;
+        const res = await clienteAxios.get(`/character/?page=${this.page}`);
+        const characters = res.data.results;
+        this.results = true;
+        this.charactersArray = this.charactersArray.concat(characters);
+        res.data.length < 20 ? (this.empty = true) : (this.empty = false);
+        this.page++;
+        console.log("this.charactersArray ", this.charactersArray);
+      } catch (error) {
+        console.log("error ", error);
+        this.results = false;
+      } finally {
+        this.loading.loadingOtherCharacters = false;
+        this.loading.loadingCharactersAtFirst = false;
+        this.loading.loadingCharactersAtFirst = false;
+      }
+    },
+    async eventScroll() {
+      let vm = this;
+      window.addEventListener("scroll", () => {
+        let scrollTop = document.documentElement.scrollTop;
+        let scrollHeight = document.documentElement.scrollHeight;
+        let clientHeight = document.documentElement.clientHeight;
+        /*
+        console.log("scrollTop ", scrollTop);
+        console.log("scrollHeight ", scrollHeight);
+        console.log("clientHeight ", clientHeight);
+        */
+        if (scrollTop + clientHeight >= scrollHeight - 10 && !vm.empty) {
+          console.log("en pagina ", vm.page);
+          if (this.page === 1) {
+            vm.loadCharacters();
+          } else {
+            vm.loadOtherCharacters();
+          }
+        }
+      });
+    },
+  },
+  async mounted() {
+    await this.eventScroll();
+  },
 };
 </script>
 
