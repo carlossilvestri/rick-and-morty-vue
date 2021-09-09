@@ -12,7 +12,7 @@
             </div>
             <div class="cont-img-main">
               <img
-                src="@/assets/img/modal/beth-test.png"
+                :src="data.image"
                 alt="Img Main Character"
                 class="img-character"
               />
@@ -20,9 +20,9 @@
                 <img src="@/assets/img/modal/star-sm.svg" alt="Star" />
               </div>
               <div class="cont-other-text">
-                <p class="soft-text">ALIVE</p>
-                <h3 class="strong-text">Beth Smith</h3>
-                <p class="soft-text">HUMAN</p>
+                <p class="soft-text">{{ data.status }}</p>
+                <h3 class="strong-text">{{ data.name }}</h3>
+                <p class="soft-text">{{ data.species }}</p>
               </div>
             </div>
             <div class="cont-relleno"></div>
@@ -37,7 +37,7 @@
                       ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
                     >Gender:
                   </p>
-                  <h3 class="strong-text">S01E01</h3>
+                  <h3 class="strong-text">{{ data.gender }}</h3>
                 </div>
                 <div class="cont-ball">
                   <p class="soft-text">
@@ -45,7 +45,7 @@
                       ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
                     >Origin:
                   </p>
-                  <h3 class="strong-text">S01E01</h3>
+                  <h3 class="strong-text">{{ data.origin.name }}</h3>
                 </div>
                 <div class="cont-ball">
                   <p class="soft-text">
@@ -53,29 +53,31 @@
                       ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
                     >Type:
                   </p>
-                  <h3 class="strong-text">S01E01</h3>
+                  <h3 class="strong-text">{{ data.type }}</h3>
                 </div>
               </div>
             </div>
             <div class="cont-info">
               <div class="cont-title-info">
-                <h4>Episodios</h4>
-              </div>
-              <div class="cont-info-balls">
-                <div class="cont-ball">
-                  <p class="soft-text">Pilot</p>
-                  <h3 class="strong-text">S01E01</h3>
-                  <p class="soft-text">DECEMBER 2, 2013</p>
+                  <h4>Episodios</h4>
                 </div>
-                <div class="cont-ball">
-                  <p class="soft-text">Pilot</p>
-                  <h3 class="strong-text">S01E01</h3>
-                  <p class="soft-text">DECEMBER 2, 2013</p>
-                </div>
-                <div class="cont-ball">
-                  <p class="soft-text">Pilot</p>
-                  <h3 class="strong-text">S01E01</h3>
-                  <p class="soft-text">DECEMBER 2, 2013</p>
+              <div v-for="(episode, index) in arrayOfEpisodesLoaded" v-bind:key="`Episode-${index}`">
+                <div class="cont-info-balls">
+                  <div class="cont-ball">
+                    <p class="soft-text">{{ episode.name }}</p>
+                    <h3 class="strong-text">{{ episode.episode }}</h3>
+                    <p class="soft-text">{{ episode.air_date }}</p>
+                  </div>
+                  <div class="cont-ball">
+                    <p class="soft-text">Pilot</p>
+                    <h3 class="strong-text">S01E01</h3>
+                    <p class="soft-text">DECEMBER 2, 2013</p>
+                  </div>
+                  <div class="cont-ball">
+                    <p class="soft-text">Pilot</p>
+                    <h3 class="strong-text">S01E01</h3>
+                    <p class="soft-text">DECEMBER 2, 2013</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -84,10 +86,12 @@
                 <h4>Personajes interesantes</h4>
               </div>
               <div class="cont-cards-modal">
-                <CardVue @openModal="openModal" />
-                <CardVue @openModal="openModal" />
-                <CardVue @openModal="openModal" />
-                <CardVue @openModal="openModal" />
+              <CardVue
+                @openModal="openModal(character.id)"
+                :info="character"
+                v-for="(character, index) in characters"
+                v-bind:key="`Character-modal-${index}`"
+              />
               </div>
               <div class="cont-btn-share">
                 <button class="btn-1">Compartir personaje</button>
@@ -102,23 +106,56 @@
 
 <script>
 import CardVue from "@/components/Card.vue";
+import clienteAxios from "@/config/axios";
+
 export default {
   name: "Modal",
-  data(){
-    return{
-      SVGXIcon: require('@/assets/img/modal/x-icon.svg?data')
-    }
+  props: ["data"],
+  data() {
+    return {
+      SVGXIcon: require("@/assets/img/modal/x-icon.svg?data"),
+      arrayOfEpisodesLoaded: [],
+      characters: []
+    };
+  },
+  mounted() {
+    this.searchEpisodesInfo(this.data.episode);
   },
   methods: {
     close() {
       this.$emit("close");
     },
-    openModal() {
-      this.$emit("openModal");
+    openModal(idCard) {
+      this.$emit("openModal", idCard);
     },
+    /**
+     * searchEpisodesInfo(arrayOfEpisodes : string[]) : void
+     */
+    searchEpisodesInfo(arrayOfEpisodes) {
+      arrayOfEpisodes.forEach(async (episode, index) => {
+        let res = await clienteAxios.get(episode);
+        this.arrayOfEpisodesLoaded.push(res.data);
+        if(index == 0){
+          this.searchCharacters(this.arrayOfEpisodesLoaded[0]);
+        }
+      });
+    },
+    /**
+     * searchCharacters(objEpisode : Object ) : void
+     */
+    searchCharacters(objEpisode){
+      console.log("objEpisode ", objEpisode);
+      
+      objEpisode.characters.forEach( async (character, index) => {
+        if(index < 3 ){
+          let res = await clienteAxios.get(character)
+          this.characters.push(res.data);
+        }
+      } )
+    }
   },
   components: {
-    CardVue
+    CardVue,
   },
 };
 </script>
@@ -191,7 +228,7 @@ export default {
         }
         .cont-img-main {
           position: absolute;
-          top: 11%;
+          top: 115px;
           right: 39%;
           max-width: 200px;
           .img-character {
@@ -261,11 +298,15 @@ export default {
           justify-content: space-between;
           margin: 10px 15px;
           .cont-ball {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
             border: 1px solid #bdbdbd;
             box-sizing: border-box;
             border-radius: 8px;
             width: 163px;
-            height: 59px;
+            height: 68px;
             text-align: left;
             padding: 5px;
             .soft-text {

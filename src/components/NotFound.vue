@@ -2,12 +2,19 @@
   <div class="cont-not-fount">
     <h4>Uh-oh!</h4>
     <p>¡Pareces perdido en tu viaje!</p>
-    <button class="btn-1">Eliminar filtros</button>
+    <button class="btn-1" @click="deleteFilters">Eliminar filtros</button>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  name:"NotFoundVue",
+  methods:{
+    deleteFilters(){
+      this.$emit('deleteFilters', 'All');
+    }
+  }
+};
 </script>
 
 <style lang="scss">

@@ -1,11 +1,11 @@
 <template>
   <div class="cont-barra">
     <ul>
-      <router-link to="/" tag="li" class="clicked-active">All</router-link>
-      <li>Unknown</li>
-      <li>Female</li>
-      <li>Male</li>
-      <li>Genderless</li>
+      <li :class="{'clicked-active': link === 'All'}" @click="changeLink('All')">All</li>
+      <li :class="{'clicked-active': link === 'unknown'}" @click="changeLink('unknown')">Unknown</li>
+      <li :class="{'clicked-active': link === 'female'}" @click="changeLink('female')">Female</li>
+      <li :class="{'clicked-active': link === 'male'}" @click="changeLink('male')">Male</li>
+      <li :class="{'clicked-active': link === 'genderless'}" @click="changeLink('genderless')">Genderless</li>
     </ul>
   </div>
 </template>
@@ -13,6 +13,27 @@
 <script>
 export default {
   name: "Bar",
+  data(){
+    return{
+      link: 'All'
+    }
+  },
+  methods: {
+    /**
+     * changeLink(linkClicked : string) : void
+     * Change link variable.
+     * @param linkClicked : string. Link string to update link variable.
+     */
+    changeLink(linkClicked){
+      this.link = linkClicked;
+    }
+  },
+  watch: {
+    link: function(newLink){
+      console.log("newLink ", newLink);
+      this.$emit("listenLink", newLink);
+    }
+  }
 };
 </script>
 

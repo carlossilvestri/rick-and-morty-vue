@@ -13,7 +13,7 @@
           class="star-inside-card"
         />
       </div>
-      <div class="cont-card-text" @click="openModal">
+      <div class="cont-card-text" @click="openModal(`${info.id}`)">
         <p class="soft-text-1">
           <span :class="{'alive': info.status === 'Alive', 'death': info.status === 'Dead'}">●</span> {{ info.status }} - {{ info.species }}
         </p>
@@ -38,8 +38,8 @@ export default {
     SpinnerVue,
   },
   methods: {
-    openModal() {
-      this.$emit("openModal");
+    openModal(idCard) {
+      this.$emit("openModal", idCard);
     },
   },
 };

@@ -10,11 +10,13 @@
           />
         </div>
         <div class="barra-container">
-          <input type="text" class="btn-buscar" />
+          <input type="text" class="btn-buscar" @click="searchCharacterByText()" />
           <input
             type="text"
             class="barra-buscar"
+            v-model="searchCharacterText"
             placeholder="Buscar personaje..."
+            @keyup.enter="searchCharacterByText()"
           />
           <input type="text" class="btn-filtro" />
         </div>
@@ -25,7 +27,7 @@
         </div>
       </div>
     </header>
-    <BarVue />
+    <BarVue @listenLink="listenBar" />
     <!-- CARDS / NOT FOUND CONTAINER -->
     <div class="cont-cards">
       <div class="cont-favs-1">
@@ -43,17 +45,24 @@
             v-bind:key="index"
           />
         </template>
-        <SpinnerVue v-if="loading.loadingCharactersAtFirst || loading.loadingOtherCharacters" />
+        <SpinnerVue v-if="loading" />
       </div>
       <!-- Not Found -->
-      <no-results v-if="!loading.loadingAtLeastSomething && !results" />
+      <no-results v-if="!loading && !results " @deleteFilters="listenBar" />
+      <!-- Pagination -->
+      <div class="cont-pagination">
+        <button class="btn-1" @click="onChangePage('prev')">Anterior</button>
+        <p>{{ page }}</p>
+        <button class="btn-1" @click="onChangePage('next')">Siguiente</button>
+      </div>
     </div>
     <!-- Modal -->
     <ModalVue
-      v-show="!noModal"
+      v-if="!noModal"
       class="fondo-oscuro animate__animated animate__bounceInRight"
       @close="toggleModal"
       @openModal="openModal"
+      :data="dataForModal"
     />
   </body>
 </template>
@@ -73,16 +82,15 @@ export default {
     return {
       noModal: true,
       charactersArray: [],
-      loading: {
-        loadingOtherCharacters: true,
-        loadingCharactersAtFirst: true,
-        loadingAtLeastSomething: true,
-      },
+      loading: true,
       results: false,
       visibility: true,
       first: false,
       empty: false,
       page: 1,
+      gender: "All",
+      dataForModal: {},
+      searchCharacterText: ""
     };
   },
   components: {
@@ -98,42 +106,113 @@ export default {
     },
   },
   methods: {
+    /**
+     * searchCharacterByText() : void
+     * Search characters by text on v-model searchCharacterText
+     */
+    async searchCharacterByText(){
+      try {
+        this.results = false;
+        this.loading = true;
+        const res = await clienteAxios.get(
+          `/character/?page=${this.page}&name=${this.searchCharacterText}`
+        );
+        const characters = res.data.results;
+        this.charactersArray = characters;
+        this.results = true;
+
+      } catch (error) {
+        console.log("error ", error);
+        this.results = false;
+      } finally {
+        this.loading = false;
+      } 
+    },
+    /**
+     * onChangePage(pageAction : string) : void
+     * @param pageAction : string. 2 possible strings 'prev' decrement page 'next' increment page
+     */
+    onChangePage(pageAction) {
+      // Page could not be 0
+      if (!this.page || pageAction === "prev" && this.page == 1) {
+        return;
+      }
+      if (pageAction === "next") {
+        this.page++;
+      }
+      if (pageAction === "prev") {
+        this.page--;
+      }
+
+      if (this.gender === "All") {
+        this.loadOtherCharacters();
+      }else{
+        this.changeCards();
+      }
+    },
     toggleModal() {
       this.noModal = !this.noModal;
     },
+    listenBar(gender) {
+      // These variables will be used when calling the end point.
+      this.gender = gender;
+      this.page = 1;
+      // Not a gender. Call normal end point.
+      if (gender === "All") {
+        this.loadCharacters();
+        return;
+      }
+      this.changeCards();
+    },
+    async changeCards() {
+      try {
+        this.results = false;
+        this.loading = true;
+        const res = await clienteAxios.get(
+          `/character/?page=${this.page}&gender=${this.gender}`
+        );
+        const characters = res.data.results;
+        this.charactersArray = characters;
+        this.results = true;
+
+      } catch (error) {
+        console.log("error ", error);
+        this.results = false;
+      } finally {
+        this.loading = false;
+      }
+    },
     /**
-     * openModal() : void
+     * openModal(idCard) : void
      * Open the Modal even thougn it's already open.
      */
-    openModal() {
+    openModal(idCard) {
+      this.searchCardById(idCard);
       // Cerrar el modal brevemente.
       this.noModal = true;
       // After 0.5 sec open the modal.
       setTimeout(() => {
         this.noModal = false;
       }, 500);
+
+    },
+    async searchCardById(idCard){
+      let url = `/character/${idCard}`
+      let res = await clienteAxios.get(url);
+      this.dataForModal = res.data;
     },
     async loadCharacters() {
       try {
-        this.loading.loadingCharactersAtFirst = true;
-        this.loading.loadingOtherCharacters = false;
-        this.loading.loadingAtLeastSomething = true;
-        const res = await clienteAxios.get("/character/?page=0");
+        this.loading = true;
+        const res = await clienteAxios.get("/character/?page=1");
         const characters = res.data.results;
         this.charactersArray = characters;
         this.results = true;
-        console.log("characters.length ", characters.length);
-        if (characters.length === 20) {
-          this.page++;
-        }
-        console.log("this.charactersArray ", this.charactersArray);
       } catch (error) {
         console.log("error ", error);
         this.results = false;
       } finally {
-        this.loading.loadingCharactersAtFirst = false;
-        this.loading.loadingOtherCharacters = false;
-        this.loading.loadingAtLeastSomething = false;
+        this.loading = false;
       }
     },
     /**
@@ -141,50 +220,45 @@ export default {
      */
     async loadOtherCharacters() {
       try {
-        this.loading.loadingOtherCharacters = true;
-        this.loading.loadingCharactersAtFirst = false;
-        this.loading.loadingAtLeastSomething = true;
-        this.page++;
+        this.loading = true;
         const res = await clienteAxios.get(`/character/?page=${this.page}`);
         const characters = res.data.results;
         this.results = true;
-        this.charactersArray = this.charactersArray.concat(characters);
-        res.data.length < 20 ? (this.empty = true) : (this.empty = false);
-        this.page++;
-        console.log("this.charactersArray ", this.charactersArray);
+        this.charactersArray = characters;
       } catch (error) {
         console.log("error ", error);
         this.results = false;
       } finally {
-        this.loading.loadingOtherCharacters = false;
-        this.loading.loadingCharactersAtFirst = false;
-        this.loading.loadingCharactersAtFirst = false;
+        this.loading = false;
       }
     },
-    async eventScroll() {
-      let vm = this;
+    async eventInit() {
+      await this.loadCharacters();
+      /*
       window.addEventListener("scroll", () => {
         let scrollTop = document.documentElement.scrollTop;
         let scrollHeight = document.documentElement.scrollHeight;
         let clientHeight = document.documentElement.clientHeight;
-        /*
+
         console.log("scrollTop ", scrollTop);
         console.log("scrollHeight ", scrollHeight);
         console.log("clientHeight ", clientHeight);
-        */
-        if (scrollTop + clientHeight >= scrollHeight - 10 && !vm.empty) {
-          console.log("en pagina ", vm.page);
+
+        if (scrollTop + clientHeight >= scrollHeight - 10 && !this.empty) {
+          console.log("en pagina ", this.page);
           if (this.page === 1) {
-            vm.loadCharacters();
+            this.loadCharacters();
           } else {
-            vm.loadOtherCharacters();
+            this.loadOtherCharacters();
           }
         }
+        
       });
+      */
     },
   },
   async mounted() {
-    await this.eventScroll();
+    await this.eventInit();
   },
 };
 </script>
@@ -275,6 +349,17 @@ export default {
     flex-wrap: wrap;
     // justify-content: center;
     align-items: center;
+  }
+}
+.cont-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  p {
+    font-family: $main-font;
+  }
+  button {
+    margin: 10px;
   }
 }
 </style>
