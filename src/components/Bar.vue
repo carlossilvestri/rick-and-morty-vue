@@ -1,11 +1,17 @@
 <template>
   <div class="cont-barra">
-    <ul>
+    <ul v-show="filterBar === 'Gender'">
       <li :class="{'clicked-active': link === 'All'}" @click="changeLink('All')">All</li>
       <li :class="{'clicked-active': link === 'unknown'}" @click="changeLink('unknown')">Unknown</li>
       <li :class="{'clicked-active': link === 'female'}" @click="changeLink('female')">Female</li>
       <li :class="{'clicked-active': link === 'male'}" @click="changeLink('male')">Male</li>
       <li :class="{'clicked-active': link === 'genderless'}" @click="changeLink('genderless')">Genderless</li>
+    </ul>
+    <ul v-show="filterBar === 'Status'">
+      <li :class="{'clicked-active': link === 'All'}" @click="changeLink('All')">All</li>
+      <li :class="{'clicked-active': link === 'alive'}" @click="changeLink('alive')">Alive</li>
+      <li :class="{'clicked-active': link === 'dead'}" @click="changeLink('dead')">Dead</li>
+      <li :class="{'clicked-active': link === 'unknown'}" @click="changeLink('unknown')">Unknown</li>
     </ul>
   </div>
 </template>
@@ -13,6 +19,7 @@
 <script>
 export default {
   name: "Bar",
+  props: ["filterBar"],
   data(){
     return{
       link: 'All'

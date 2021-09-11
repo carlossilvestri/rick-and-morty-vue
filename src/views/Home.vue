@@ -18,16 +18,16 @@
             placeholder="Buscar personaje..."
             @keyup.enter="searchCharacterByText()"
           />
-          <input type="text" class="btn-filtro" />
+          <input type="text" class="btn-filtro" @click="showFilters = !showFilters" />
         </div>
-        <div class="cont-filters">
+        <div class="cont-filters" v-show="showFilters">
           <p class="filter-text">
-            Filtro aplicados: <span>Status, Origin.</span>
+            Filtrar por: <span @click="filterBar = 'Status'" :class="{'selected': filterBar == 'Status' }">Status,</span> <span @click="filterBar = 'Gender'" :class="{'selected': filterBar == 'Gender' }"> Gender.</span>
           </p>
         </div>
       </div>
     </header>
-    <BarVue @listenLink="listenBar" />
+    <BarVue @listenLink="listenBar" :filterBar="filterBar" />
     <!-- CARDS / NOT FOUND CONTAINER -->
     <div class="cont-cards">
       <div class="cont-favs-1">
@@ -90,7 +90,9 @@ export default {
       page: 1,
       gender: "All",
       dataForModal: {},
-      searchCharacterText: ""
+      searchCharacterText: "",
+      filterBar: 'Gender',
+      showFilters: true
     };
   },
   components: {
@@ -114,8 +116,10 @@ export default {
       try {
         this.results = false;
         this.loading = true;
+        let stringFilter = this.getStringFilter();
+        // let stringFilters = ;
         const res = await clienteAxios.get(
-          `/character/?page=${this.page}&name=${this.searchCharacterText}`
+          `/character/?page=${this.page}&name=${this.searchCharacterText}${stringFilter}`
         );
         const characters = res.data.results;
         this.charactersArray = characters;
@@ -127,6 +131,20 @@ export default {
       } finally {
         this.loading = false;
       } 
+    },
+    /**
+     * getStringFilter() : string
+     * Get the string to filter gender or status. If all, should return ''
+     */
+    getStringFilter(){
+      let stringToReturn = '';
+      let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
+      if(this.gender === 'All'){
+        stringToReturn = '';
+      }else{
+        stringToReturn = `&${genderOrStatusString}=${this.gender}`;
+      }
+      return stringToReturn;
     },
     /**
      * onChangePage(pageAction : string) : void
@@ -143,11 +161,13 @@ export default {
       if (pageAction === "prev") {
         this.page--;
       }
-
+      if(this.searchCharacterText.length > 0){
+        this.searchCharacterByText();
+      }
       if (this.gender === "All") {
         this.loadOtherCharacters();
       }else{
-        this.changeCards();
+        this.searchCharacterText();
       }
     },
     toggleModal() {
@@ -162,14 +182,15 @@ export default {
         this.loadCharacters();
         return;
       }
-      this.changeCards();
+      this.searchCharacterByText();
     },
     async changeCards() {
       try {
         this.results = false;
         this.loading = true;
+        let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
         const res = await clienteAxios.get(
-          `/character/?page=${this.page}&gender=${this.gender}`
+          `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`
         );
         const characters = res.data.results;
         this.charactersArray = characters;
@@ -181,6 +202,20 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    /**
+     * knowIfItIsByGenderOrStatus() : string
+     */
+    knowIfItIsByGenderOrStatus(){
+      let stringDecision = '';
+      console.log("filterBar ", this.filterBar);
+      if(this.filterBar == 'Gender'){
+        stringDecision = 'gender';
+      }
+      if(this.filterBar == 'Status'){
+        stringDecision = 'status';
+      }
+      return stringDecision;
     },
     /**
      * openModal(idCard) : void
@@ -316,9 +351,16 @@ export default {
       span {
         color: $main-color;
         font-weight: normal;
+        cursor: pointer;
+        &:hover{
+          color: #34c759;
+        }
       }
     }
   }
+}
+.selected{
+   color: #34c759 !important;
 }
 .cont-cards {
   .cont-favs-1 {

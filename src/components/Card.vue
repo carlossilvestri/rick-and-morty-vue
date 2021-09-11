@@ -21,7 +21,7 @@
         <p class="soft-text-2">Last known location:</p>
         <p class="intermediate-text-1 margin">{{ info.location.name }}</p>
         <p class="soft-text-2">First seen in:</p>
-        <p class="intermediate-text-1">Never Ricking Morty</p>
+        <p class="intermediate-text-1">{{ showDate(info.created) }}</p>
       </div>
     </div>
     <SpinnerVue v-else/>
@@ -41,6 +41,14 @@ export default {
     openModal(idCard) {
       this.$emit("openModal", idCard);
     },
+    showDate(string){
+      let date = [];
+      date.push(new Date(string).getFullYear());
+      date.push(new Date(string).getMonth());
+      date.push(new Date(string).getDay());
+      let dateToReturn = `${date[2]}/${date[1]}/${date[0]}`;
+      return dateToReturn;
+    }
   },
 };
 </script>
