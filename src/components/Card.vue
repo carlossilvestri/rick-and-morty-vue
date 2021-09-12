@@ -3,6 +3,7 @@
     <div class="cont-card" v-if="info">
       <div class="cont-img-card">
         <img
+          data-testId="image"
           :src="info.image"
           alt="Morty"
           class="character-show"
@@ -13,15 +14,15 @@
           class="star-inside-card"
         />
       </div>
-      <div class="cont-card-text" @click="openModal(`${info.id}`)">
+      <div data-testId="cont-text-card" class="cont-card-text" @click="openModal(`${info.id}`)">
         <p class="soft-text-1">
           <span :class="{'alive': info.status === 'Alive', 'death': info.status === 'Dead'}">●</span> {{ info.status }} - {{ info.species }}
         </p>
-        <h5 class="name-text">{{ info.name }}</h5>
+        <h5 data-testId="info-name" class="name-text">{{ info.name }}</h5>
         <p class="soft-text-2">Last known location:</p>
-        <p class="intermediate-text-1 margin">{{ info.location.name }}</p>
+        <p data-testId="info-location-name" class="intermediate-text-1 margin">{{ info.location.name }}</p>
         <p class="soft-text-2">First seen in:</p>
-        <p class="intermediate-text-1">{{ showDate(info.created) }}</p>
+        <p data-testId="info-created" class="intermediate-text-1">{{ showDate(info.created) }}</p>
       </div>
     </div>
     <SpinnerVue v-else/>
