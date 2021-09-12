@@ -148,7 +148,8 @@ export default {
     },
     /**
      * onChangePage(pageAction : string) : void
-     * @param pageAction : string. 2 possible strings 'prev' decrement page 'next' increment page
+     * @param pageAction : string. 2 possible strings 'prev' decrement page 'next' increment page.
+     * This function is called when the user click on 'Anterior' or 'Siguiente'. This function calls other functions relying on the parameters and validations.
      */
     onChangePage(pageAction) {
       // Page could not be 0
@@ -170,9 +171,18 @@ export default {
         this.searchCharacterText();
       }
     },
+    /**
+     * toggleModal() : void
+     * This function is responsible of changing variable 'noModal'. If it's true it assigns to false, if it's false it assigns to true.
+     */
     toggleModal() {
       this.noModal = !this.noModal;
     },
+    /**
+     * listenBar(gender : string) : void
+     * @param gender : string.
+     * When the user click on the links of the bar, this function is responsible for calling the end points to get the info.
+     */
     listenBar(gender) {
       // These variables will be used when calling the end point.
       this.gender = gender;
@@ -205,10 +215,10 @@ export default {
     },
     /**
      * knowIfItIsByGenderOrStatus() : string
+     * This function return 'gender' or 'status'. Useful to know what parameters to filter.
      */
     knowIfItIsByGenderOrStatus(){
       let stringDecision = '';
-      console.log("filterBar ", this.filterBar);
       if(this.filterBar == 'Gender'){
         stringDecision = 'gender';
       }
@@ -231,11 +241,20 @@ export default {
       }, 500);
 
     },
+    /**
+     * searchCardById(idCard : int) : void
+     * @param idCard : int.
+     * Call an end-point to get info of an especific card by its id.
+     */
     async searchCardById(idCard){
       let url = `/character/${idCard}`
       let res = await clienteAxios.get(url);
       this.dataForModal = res.data;
     },
+    /**
+     * loadCharacters() : void
+     * This function fills charactersArray variable, to load the characters to be shown, but loads jus the first page.
+     */
     async loadCharacters() {
       try {
         this.loading = true;
@@ -251,7 +270,8 @@ export default {
       }
     },
     /**
-     * Tiene paginacion, ya que acumula los personajes.
+     * loadOtherCharacters() : void
+     * This function fills charactersArray variable, to load the characters to be shown. It loads by page.
      */
     async loadOtherCharacters() {
       try {
@@ -267,33 +287,9 @@ export default {
         this.loading = false;
       }
     },
-    async eventInit() {
-      await this.loadCharacters();
-      /*
-      window.addEventListener("scroll", () => {
-        let scrollTop = document.documentElement.scrollTop;
-        let scrollHeight = document.documentElement.scrollHeight;
-        let clientHeight = document.documentElement.clientHeight;
-
-        console.log("scrollTop ", scrollTop);
-        console.log("scrollHeight ", scrollHeight);
-        console.log("clientHeight ", clientHeight);
-
-        if (scrollTop + clientHeight >= scrollHeight - 10 && !this.empty) {
-          console.log("en pagina ", this.page);
-          if (this.page === 1) {
-            this.loadCharacters();
-          } else {
-            this.loadOtherCharacters();
-          }
-        }
-        
-      });
-      */
-    },
   },
   async mounted() {
-    await this.eventInit();
+    await this.loadCharacters();
   },
 };
 </script>

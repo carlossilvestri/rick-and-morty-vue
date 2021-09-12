@@ -39,14 +39,24 @@ export default {
     SpinnerVue,
   },
   methods: {
+    /**
+     * openModal(idCard : int) : void
+     * @param idCard : int. id of the card that the user wish to open.
+     * Emit event 'openModal' to the parent to open the modal.
+     */
     openModal(idCard) {
       this.$emit("openModal", idCard);
     },
-    showDate(string){
+    /**
+     * showDate(dateGiven : Date) : string
+     * @param dateGiven : Date.
+     * This function return a better formarted date to show to the user.
+     */
+    showDate(dateGiven){
       let date = [];
-      date.push(new Date(string).getFullYear());
-      date.push(new Date(string).getMonth());
-      date.push(new Date(string).getDay());
+      date.push(new Date(dateGiven).getFullYear());
+      date.push(new Date(dateGiven).getMonth());
+      date.push(new Date(dateGiven).getDay());
       let dateToReturn = `${date[2]}/${date[1]}/${date[0]}`;
       return dateToReturn;
     }

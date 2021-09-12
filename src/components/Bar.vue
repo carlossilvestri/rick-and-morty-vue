@@ -37,7 +37,6 @@ export default {
   },
   watch: {
     link: function(newLink){
-      console.log("newLink ", newLink);
       this.$emit("listenLink", newLink);
     }
   }

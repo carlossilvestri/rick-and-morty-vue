@@ -19,18 +19,16 @@ describe('Card.vue', () => {
     expect(infoLocationName.element.textContent.length).toBeGreaterThan(0);
     expect(infoCreated.element.textContent.length).toBeGreaterThan(0);
   });
-  xit('Must call $emit method when click on ', async () => {
+  it('Should call openModal method when cont-text-card is clicked', async () => {
     const wrapper = mount(Card, {
       propsData: {
         info: mockCharacters
       }
     });
-    const contTextCard = wrapper.find("[data-testId='cont-text-card']");
-    contTextCard.trigger("click");
+    const spyOpenModal = jest.spyOn(wrapper.vm, 'openModal');
+    wrapper.find("[data-testId='cont-text-card']").trigger("click");
     await wrapper.vm.$nextTick();
-    const openModal = jest.spyOn(Card.methods, 'openModal');
-    console.log("openModal ", openModal);
-    expect(openModal).toHaveBeenCalled();
+    expect(spyOpenModal).toHaveBeenCalled();
 
   })
 })

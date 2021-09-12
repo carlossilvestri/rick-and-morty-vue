@@ -10,6 +10,10 @@
 export default {
   name:"NotFoundVue",
   methods:{
+    /**
+     * deleteFilters() : void
+     * This function emits an event to its parent ('deleteFilters').
+     */
     deleteFilters(){
       this.$emit('deleteFilters', 'All');
     }

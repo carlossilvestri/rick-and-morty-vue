@@ -12,6 +12,7 @@
             </div>
             <div class="cont-img-main">
               <img
+                data-testId='image-modal'
                 :src="data.image"
                 alt="Img Main Character"
                 class="img-character"
@@ -20,9 +21,9 @@
                 <img src="@/assets/img/modal/star-sm.svg" alt="Star" />
               </div>
               <div class="cont-other-text">
-                <p class="soft-text">{{ data.status }}</p>
-                <h3 class="strong-text">{{ data.name }}</h3>
-                <p class="soft-text">{{ data.species }}</p>
+                <p data-testId='data-status' class="soft-text">{{ data.status }}</p>
+                <h3 data-testId='data-name' class="strong-text">{{ data.name }}</h3>
+                <p data-testId='data-species' class="soft-text">{{ data.species }}</p>
               </div>
             </div>
             <div class="cont-relleno"></div>
@@ -113,7 +114,6 @@ export default {
   props: ["data"],
   data() {
     return {
-      SVGXIcon: require("@/assets/img/modal/x-icon.svg?data"),
       arrayOfEpisodesLoaded: [],
       characters: []
     };
@@ -122,14 +122,25 @@ export default {
     this.searchEpisodesInfo(this.data.episode);
   },
   methods: {
+    /**
+     * close() : void
+     * Emit event 'close' to the parent to hide the modal.
+     */
     close() {
       this.$emit("close");
     },
+    /**
+     * openModal(idCard : int) : void
+     * @param idCard : int. id of the card that the user wish to open.
+     * Emit event 'openModal' to the parent to open the modal.
+     */
     openModal(idCard) {
       this.$emit("openModal", idCard);
     },
     /**
      * searchEpisodesInfo(arrayOfEpisodes : string[]) : void
+     * @param arrayOfEpisodes : string[]. Array of episodes (Rick and Morty), URL end-point.
+     * This function fills variable 'arrayOfEpisodesLoaded', and call function searchCharacters.
      */
     searchEpisodesInfo(arrayOfEpisodes) {
       arrayOfEpisodes.forEach(async (episode, index) => {
@@ -142,10 +153,10 @@ export default {
     },
     /**
      * searchCharacters(objEpisode : Object ) : void
+     * @param objEpisode : Object. Object that contains an array of characters.
+     * This function fills the variable 'characters', using the end-point given, (Just 3 are needed).
      */
     searchCharacters(objEpisode){
-      console.log("objEpisode ", objEpisode);
-      
       objEpisode.characters.forEach( async (character, index) => {
         if(index < 3 ){
           let res = await clienteAxios.get(character)
