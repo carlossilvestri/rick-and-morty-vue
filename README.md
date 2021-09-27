@@ -1,7 +1,7 @@
 # vue-carrito-de-compras
 
 ### SPA sobre el programa de Rick and Morty.
-### Échale un vistazo en: <a href="https://determined-mirzakhani-ff3cba.netlify.app/">https://determined-mirzakhani-ff3cba.netlify.app/</a>
+### Échale un vistazo en: <a target="_blank" href="https://determined-mirzakhani-ff3cba.netlify.app/">https://determined-mirzakhani-ff3cba.netlify.app/</a>
 
 ## Project setup
 ```
