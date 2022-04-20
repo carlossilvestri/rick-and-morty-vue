@@ -32,13 +32,13 @@
           <p class="filter-text">
             Filtrar por:
             <span
-              @click="filterBarText = 'Status';"
-              :class="{ selected: filterBarText == 'Status' }"
+              @click="setFilterName('Status')"
+              :class="{ selected: filterName == 'Status' }"
               >Status,</span
             >
             <span
-              @click="filterBarText = 'Gender';"
-              :class="{ selected: filterBarText == 'Gender' }"
+              @click="setFilterName('Gender')"
+              :class="{ selected: filterName == 'Gender' }"
             >
               Gender.</span
             >
@@ -46,15 +46,14 @@
         </div>
       </div>
     </header>
-    <BarVue @listenLink="listenBar" :filterBar="filterBarText" />
-    <p>{{ gender}}</p>
-    <router-view/>
+    <BarVue @listenLink="listenBar" />
+    <router-view />
     <!-- Modal -->
-      <ModalVue
-        v-if="selectedCharacter.id ? true : false"
-        class="fondo-oscuro animate__animated animate__bounceInRight"
-        :data="selectedCharacter"
-      />
+    <ModalVue
+      v-if="selectedCharacter.id ? true : false"
+      class="fondo-oscuro animate__animated animate__bounceInRight"
+      :data="selectedCharacter"
+    />
   </body>
 </template>
 
@@ -64,13 +63,13 @@ import BarVue from "@/components/Bar.vue";
 import ModalVue from "@/components/Modal.vue";
 
 import clienteAxios from "@/config/axios";
-import {actionsMixin} from "@/mixins/actionsMixin.js";
+import { actionsMixin } from "@/mixins/actionsMixin.js";
 
 export default {
   name: "ContainerMain",
   components: {
     BarVue,
-    ModalVue
+    ModalVue,
   },
   mixins: [actionsMixin],
   methods: {
@@ -78,14 +77,16 @@ export default {
      * searchCharacterByText() : void
      * Search characters by text on v-model searchCharacterText
      */
-    async searchCharacterByText(){
+    async searchCharacterByText() {
       try {
         this.results = false;
         let stringFilter = this.getStringFilter();
-        let stringFilters =  `/character/?page=${this.page}&name=${this.searchCharacterText}${stringFilter}`;
-        const store = { endPointString: stringFilters, pageName: this.pageName  }
+        let stringFilters = `/character/?page=${this.page}&name=${this.searchCharacterText}${stringFilter}`;
+        const store = {
+          endPointString: stringFilters,
+          pageName: this.pageName,
+        };
         await this.setAllActions(store);
-
       } catch (error) {
         console.log("error ", error);
         this.results = false;
@@ -97,13 +98,13 @@ export default {
      * getStringFilter() : string
      * Get the string to filter gender or status. If all, should return ''
      */
-    getStringFilter(){
-      let stringToReturn = '';
+    getStringFilter() {
+      let stringToReturn = "";
       let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
       console.log(" this.gender ", this.gender);
-      if(this.gender === 'All'){
-        stringToReturn = '';
-      }else{
+      if (this.gender === "All") {
+        stringToReturn = "";
+      } else {
         stringToReturn = `&${genderOrStatusString}=${this.gender}`;
       }
       return stringToReturn;
@@ -115,7 +116,7 @@ export default {
      */
     onChangePage(pageAction) {
       // Page could not be 0
-      if (!this.page || pageAction === "prev" && this.page == 1) {
+      if (!this.page || (pageAction === "prev" && this.page == 1)) {
         return;
       }
       if (pageAction === "next") {
@@ -124,12 +125,12 @@ export default {
       if (pageAction === "prev") {
         this.page--;
       }
-      if(this.searchCharacterText.length > 0){
+      if (this.searchCharacterText.length > 0) {
         this.searchCharacterByText();
       }
       if (this.gender === "All") {
         this.loadOtherCharacters();
-      }else{
+      } else {
         this.searchCharacterText();
       }
     },
@@ -151,13 +152,16 @@ export default {
       try {
         this.results = false;
         let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
-        let stringFilters = `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`
+        let stringFilters = `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`;
         const res = await clienteAxios.get(stringFilters);
         const characters = res.data.results;
-        const store = { endPointString: stringFilters, pageName: this.pageName, characters  }
+        const store = {
+          endPointString: stringFilters,
+          pageName: this.pageName,
+          characters,
+        };
         this.setAllActions(store);
         this.charactersArray = characters;
-
       } catch (error) {
         console.log("error ", error);
         this.results = false;
@@ -169,13 +173,13 @@ export default {
      * knowIfItIsByGenderOrStatus() : string
      * This function return 'gender' or 'status'. Useful to know what parameters to filter.
      */
-    knowIfItIsByGenderOrStatus(){
-      let stringDecision = '';
-      if(this.filterBar == 'Gender'){
-        stringDecision = 'gender';
+    knowIfItIsByGenderOrStatus() {
+      let stringDecision = "";
+      if (this.filterBar == "Gender") {
+        stringDecision = "gender";
       }
-      if(this.filterBar == 'Status'){
-        stringDecision = 'status';
+      if (this.filterBar == "Status") {
+        stringDecision = "status";
       }
       return stringDecision;
     },
@@ -184,8 +188,8 @@ export default {
      * @param idCard : int.
      * Call an end-point to get info of an especific card by its id.
      */
-    async searchCardById(idCard){
-      let url = `/character/${idCard}`
+    async searchCardById(idCard) {
+      let url = `/character/${idCard}`;
       let res = await clienteAxios.get(url);
       this.dataForModal = res.data;
     },
@@ -194,10 +198,16 @@ export default {
      * This function fills charactersArray variable, to load the characters to be shown, but loads jus the first page.
      */
     async loadCharacters() {
-      if(this.pageName !== "/app/home") return;
+      if (this.pageName !== "/app/home") return;
       try {
-        let stringFilters = this.endPointString.length > 0 ? this.endPointString :"/character/?page=1";
-        const store = { endPointString: stringFilters, pageName: this.pageName  }
+        let stringFilters =
+          this.endPointString.length > 0
+            ? this.endPointString
+            : "/character/?page=1";
+        const store = {
+          endPointString: stringFilters,
+          pageName: this.pageName,
+        };
         await this.setAllActions(store);
       } catch (error) {
         console.log("error ", error);
@@ -213,7 +223,10 @@ export default {
     async loadOtherCharacters() {
       try {
         let stringFilters = `/character/?page=${this.page}`;
-        const store = { endPointString: stringFilters, pageName: this.pageName  }
+        const store = {
+          endPointString: stringFilters,
+          pageName: this.pageNameFromVuex,
+        };
         await this.setAllActions(store);
       } catch (error) {
         console.log("error ", error);
@@ -224,7 +237,13 @@ export default {
     },
   },
   async mounted() {
+    this.searchCharacterText = this.searchBar;
     await this.loadCharacters();
+  },
+  watch: {
+    searchCharacterText: function(searchString) {
+      this.setSearchBar(searchString)
+    },
   },
 };
 </script>

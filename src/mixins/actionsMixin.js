@@ -8,30 +8,41 @@ export const actionsMixin = {
       visibility: true,
       first: false,
       empty: false,
-      page: 1,
       dataForModal: {},
       searchCharacterText: "",
       filterBarText: "Gender",
-      showFilters: true,
-      pageName: "",
+      showFilters: true
     };
   },
   computed: mapGetters({
     characters: "characters",
     gender: "gender",
+    status: "status",
+    page: "page",
+    searchBar: "searchBar",
     linkFilter: "linkFilter",
+    filterName: "filterName",
     isThereCharacters: "isThereCharacters",
     isThereFavoriteCharacters: "isThereFavoriteCharacters",
     isLoadingCharacters: "isLoadingCharacters",
     favoriteCharacters: "favoriteCharacters",
     selectedCharacter: "selectedCharacter",
     pageNameFromVuex: "pageName",
+    isTherePageName: "isTherePageName",
     endPointString: "endPointString",
   }),
   methods: {
     ...mapActions({
       setCharactersAsync: "setCharactersAsync",
-    }),
+      setFilterName: "setFilterName",
+      setSearchBar: "setSearchBar",
+      setPage: "setPage"
+          }),
+    /**
+     * This method is used to set pageName to vuex store and move to that route.
+     * return void
+     * @param string newRoute 
+     */
     changeRoute(newRoute) {
       this.setPageNameOnVuex(newRoute);
       this.$router.push(newRoute);

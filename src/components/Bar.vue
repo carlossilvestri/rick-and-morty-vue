@@ -1,58 +1,58 @@
 <template>
   <div class="cont-barra">
-    <ul v-show="filterBar === 'Gender'">
+    <ul v-show="filterName === 'Gender'">
       <li
-        :class="{ 'clicked-active': link === 'All' }"
+        :class="{ 'clicked-active': gender === 'All' }"
         @click="changeLink('All')"
       >
         All
       </li>
       <li
-        :class="{ 'clicked-active': link === 'unknown' }"
+        :class="{ 'clicked-active': gender === 'unknown' }"
         @click="changeLink('unknown')"
       >
         Unknown
       </li>
       <li
-        :class="{ 'clicked-active': link === 'female' }"
+        :class="{ 'clicked-active': gender === 'female' }"
         @click="changeLink('female')"
       >
         Female
       </li>
       <li
-        :class="{ 'clicked-active': link === 'male' }"
+        :class="{ 'clicked-active': gender === 'male' }"
         @click="changeLink('male')"
       >
         Male
       </li>
       <li
-        :class="{ 'clicked-active': link === 'genderless' }"
+        :class="{ 'clicked-active': gender === 'genderless' }"
         @click="changeLink('genderless')"
       >
         Genderless
       </li>
     </ul>
-    <ul v-show="filterBar === 'Status'">
+    <ul v-show="filterName === 'Status'">
       <li
-        :class="{ 'clicked-active': link === 'All' }"
+        :class="{ 'clicked-active': status === 'All' }"
         @click="changeLink('All')"
       >
         All
       </li>
       <li
-        :class="{ 'clicked-active': link === 'alive' }"
+        :class="{ 'clicked-active': status === 'alive' }"
         @click="changeLink('alive')"
       >
         Alive
       </li>
       <li
-        :class="{ 'clicked-active': link === 'dead' }"
+        :class="{ 'clicked-active': status === 'dead' }"
         @click="changeLink('dead')"
       >
         Dead
       </li>
       <li
-        :class="{ 'clicked-active': link === 'unknown' }"
+        :class="{ 'clicked-active': status === 'unknown' }"
         @click="changeLink('unknown')"
       >
         Unknown
@@ -65,7 +65,6 @@
 import { actionsMixin } from "@/mixins/actionsMixin.js";
 export default {
   name: "Bar",
-  props: ["filterBar"],
   mixins: [actionsMixin],
   data() {
     return {
@@ -80,42 +79,38 @@ export default {
      */
     changeLink(linkClicked) {
       let linkFilterObj = {
+        filterName: this.filterName,
         gender: {
-          isActive: true,
           name: "All",
         },
         status: {
-          isActive: false,
           name: "",
         },
       };
 
-      if (this.filterBar === "Gender") {
-        // TODO: SET filterLink
+      if (this.filterName === "Gender") {
         linkFilterObj = {
+          filterName: this.filterName,
           gender: {
-            isActive: true,
             name: linkClicked,
           },
           status: {
-            isActive: false,
             name: "",
           },
         };
       }
-      if (this.filterBar === "Status") {
-        // TODO: SET filterLink
+      if (this.filterName === "Status") {
         linkFilterObj = {
+          filterName: this.filterName,
           gender: {
-            isActive: false,
             name: "",
           },
           status: {
-            isActive: true,
             name: linkClicked,
           },
         };
       }
+      console.log("linkFilterObj ", linkFilterObj);
       this.setlinkFilterrOnVuex(linkFilterObj);
       console.log("linkClicked ", linkClicked);
       this.link = linkClicked;
@@ -125,7 +120,7 @@ export default {
     link: function(newLink) {
       this.$emit("listenLink", newLink);
     },
-    filterBar: function() {
+    filterName: function() {
       this.changeLink("All");
     },
   },

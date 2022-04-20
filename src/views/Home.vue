@@ -114,15 +114,17 @@ export default {
      * This function is called when the user click on 'Anterior' or 'Siguiente'. This function calls other functions relying on the parameters and validations.
      */
     onChangePage(pageAction) {
+      console.log("this.page ", this.page);
+      console.log("pageAction", pageAction);
       // Page could not be 0
       if (!this.page || (pageAction === "prev" && this.page == 1)) {
         return;
       }
       if (pageAction === "next") {
-        this.page++;
+        this.setPage(this.page + 1);
       }
       if (pageAction === "prev") {
-        this.page--;
+        this.setPage(this.page - 1);
       }
       if (this.searchCharacterText.length > 0) {
         this.searchCharacterByText();

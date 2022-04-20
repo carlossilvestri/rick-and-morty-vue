@@ -5,21 +5,19 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { actionsMixin } from "@/mixins/actionsMixin.js";
 export default {
   name: "App",
   components: {},
   data() {
     return {};
   },
+  mixins: [actionsMixin],
   methods: {
-    ...mapActions({
-      setPageName: "setPageName",
-    }),
   },
   watch: {
     $route(to) {
-      this.setPageName(to.path);
+      this.setPageNameOnVuex(to.path);
     },
   },
 };
