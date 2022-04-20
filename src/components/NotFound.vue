@@ -1,14 +1,15 @@
 <template>
   <div class="cont-not-fount">
-    <h4>Uh-oh!</h4>
-    <p>¡Pareces perdido en tu viaje!</p>
-    <button class="btn-1" @click="deleteFilters">Eliminar filtros</button>
+    <h4>{{noResultsObj.primaryText}}</h4>
+    <p>{{noResultsObj.secondaryText}}</p>
+    <button v-if="noResultsObj.showButton" class="btn-1" @click="deleteFilters">{{noResultsObj.thirdText}}</button>
   </div>
 </template>
 
 <script>
 export default {
   name:"NotFoundVue",
+  props: ["noResultsObj"],
   methods:{
     /**
      * deleteFilters() : void

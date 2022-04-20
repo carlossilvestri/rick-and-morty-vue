@@ -1,29 +1,76 @@
 <template>
   <div class="cont-barra">
     <ul v-show="filterBar === 'Gender'">
-      <li :class="{'clicked-active': link === 'All'}" @click="changeLink('All')">All</li>
-      <li :class="{'clicked-active': link === 'unknown'}" @click="changeLink('unknown')">Unknown</li>
-      <li :class="{'clicked-active': link === 'female'}" @click="changeLink('female')">Female</li>
-      <li :class="{'clicked-active': link === 'male'}" @click="changeLink('male')">Male</li>
-      <li :class="{'clicked-active': link === 'genderless'}" @click="changeLink('genderless')">Genderless</li>
+      <li
+        :class="{ 'clicked-active': link === 'All' }"
+        @click="changeLink('All')"
+      >
+        All
+      </li>
+      <li
+        :class="{ 'clicked-active': link === 'unknown' }"
+        @click="changeLink('unknown')"
+      >
+        Unknown
+      </li>
+      <li
+        :class="{ 'clicked-active': link === 'female' }"
+        @click="changeLink('female')"
+      >
+        Female
+      </li>
+      <li
+        :class="{ 'clicked-active': link === 'male' }"
+        @click="changeLink('male')"
+      >
+        Male
+      </li>
+      <li
+        :class="{ 'clicked-active': link === 'genderless' }"
+        @click="changeLink('genderless')"
+      >
+        Genderless
+      </li>
     </ul>
     <ul v-show="filterBar === 'Status'">
-      <li :class="{'clicked-active': link === 'All'}" @click="changeLink('All')">All</li>
-      <li :class="{'clicked-active': link === 'alive'}" @click="changeLink('alive')">Alive</li>
-      <li :class="{'clicked-active': link === 'dead'}" @click="changeLink('dead')">Dead</li>
-      <li :class="{'clicked-active': link === 'unknown'}" @click="changeLink('unknown')">Unknown</li>
+      <li
+        :class="{ 'clicked-active': link === 'All' }"
+        @click="changeLink('All')"
+      >
+        All
+      </li>
+      <li
+        :class="{ 'clicked-active': link === 'alive' }"
+        @click="changeLink('alive')"
+      >
+        Alive
+      </li>
+      <li
+        :class="{ 'clicked-active': link === 'dead' }"
+        @click="changeLink('dead')"
+      >
+        Dead
+      </li>
+      <li
+        :class="{ 'clicked-active': link === 'unknown' }"
+        @click="changeLink('unknown')"
+      >
+        Unknown
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
+import { actionsMixin } from "@/mixins/actionsMixin.js";
 export default {
   name: "Bar",
   props: ["filterBar"],
-  data(){
-    return{
-      link: 'All'
-    }
+  mixins: [actionsMixin],
+  data() {
+    return {
+      link: "All",
+    };
   },
   methods: {
     /**
@@ -31,15 +78,57 @@ export default {
      * Change link variable.
      * @param linkClicked : string. Link string to update link variable.
      */
-    changeLink(linkClicked){
+    changeLink(linkClicked) {
+      let linkFilterObj = {
+        gender: {
+          isActive: true,
+          name: "All",
+        },
+        status: {
+          isActive: false,
+          name: "",
+        },
+      };
+
+      if (this.filterBar === "Gender") {
+        // TODO: SET filterLink
+        linkFilterObj = {
+          gender: {
+            isActive: true,
+            name: linkClicked,
+          },
+          status: {
+            isActive: false,
+            name: "",
+          },
+        };
+      }
+      if (this.filterBar === "Status") {
+        // TODO: SET filterLink
+        linkFilterObj = {
+          gender: {
+            isActive: false,
+            name: "",
+          },
+          status: {
+            isActive: true,
+            name: linkClicked,
+          },
+        };
+      }
+      this.setlinkFilterrOnVuex(linkFilterObj);
+      console.log("linkClicked ", linkClicked);
       this.link = linkClicked;
-    }
+    },
   },
   watch: {
-    link: function(newLink){
+    link: function(newLink) {
       this.$emit("listenLink", newLink);
-    }
-  }
+    },
+    filterBar: function() {
+      this.changeLink("All");
+    },
+  },
 };
 </script>
 

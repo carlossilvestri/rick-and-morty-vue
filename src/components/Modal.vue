@@ -12,7 +12,7 @@
             </div>
             <div class="cont-img-main">
               <img
-                data-testId='image-modal'
+                data-testId="image-modal"
                 :src="data.image"
                 alt="Img Main Character"
                 class="img-character"
@@ -21,9 +21,15 @@
                 <img src="@/assets/img/modal/star-sm.svg" alt="Star" />
               </div>
               <div class="cont-other-text">
-                <p data-testId='data-status' class="soft-text">{{ data.status }}</p>
-                <h3 data-testId='data-name' class="strong-text">{{ data.name }}</h3>
-                <p data-testId='data-species' class="soft-text">{{ data.species }}</p>
+                <p data-testId="data-status" class="soft-text">
+                  {{ data.status }}
+                </p>
+                <h3 data-testId="data-name" class="strong-text">
+                  {{ data.name }}
+                </h3>
+                <p data-testId="data-species" class="soft-text text-uppercase">
+                  {{ data.species }}
+                </p>
               </div>
             </div>
             <div class="cont-relleno"></div>
@@ -38,7 +44,7 @@
                       ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
                     >Gender:
                   </p>
-                  <h3 class="strong-text">{{ data.gender }}</h3>
+                  <h3 class="strong-text">{{ showInfo(data.gender) }}</h3>
                 </div>
                 <div class="cont-ball">
                   <p class="soft-text">
@@ -46,7 +52,7 @@
                       ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
                     >Origin:
                   </p>
-                  <h3 class="strong-text">{{ data.origin.name }}</h3>
+                  <h3 class="strong-text">{{ showInfo(data.origin.name) }}</h3>
                 </div>
                 <div class="cont-ball">
                   <p class="soft-text">
@@ -54,15 +60,18 @@
                       ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
                     >Type:
                   </p>
-                  <h3 class="strong-text">{{ data.type }}</h3>
+                  <h3 class="strong-text">{{ showInfo(data.type) }}</h3>
                 </div>
               </div>
             </div>
             <div class="cont-info">
               <div class="cont-title-info">
-                  <h4>Episodios</h4>
-                </div>
-              <div v-for="(episode, index) in arrayOfEpisodesLoaded" v-bind:key="`Episode-${index}`">
+                <h4>Episodios</h4>
+              </div>
+              <div
+                v-for="(episode, index) in arrayOfEpisodesLoaded"
+                v-bind:key="`Episode-${index}`"
+              >
                 <div class="cont-info-balls">
                   <div class="cont-ball">
                     <p class="soft-text">{{ episode.name }}</p>
@@ -87,12 +96,12 @@
                 <h4>Personajes interesantes</h4>
               </div>
               <div class="cont-cards-modal">
-              <CardVue
-                @openModal="openModal(character.id)"
-                :info="character"
-                v-for="(character, index) in characters"
-                v-bind:key="`Character-modal-${index}`"
-              />
+                <CardVue
+                  @openModal="openModal()"
+                  :info="character"
+                  v-for="(character, index) in charactersInModal"
+                  v-bind:key="`Character-modal-${index}`"
+                />
               </div>
               <div class="cont-btn-share">
                 <button class="btn-1">Compartir personaje</button>
@@ -106,36 +115,37 @@
 </template>
 
 <script>
+import {actionsMixin} from "@/mixins/actionsMixin.js";
 import CardVue from "@/components/Card.vue";
 import clienteAxios from "@/config/axios";
 
 export default {
   name: "Modal",
   props: ["data"],
+  mixins: [actionsMixin],
   data() {
     return {
       arrayOfEpisodesLoaded: [],
-      characters: []
+      charactersInModal: [],
     };
   },
   mounted() {
     this.searchEpisodesInfo(this.data.episode);
   },
   methods: {
+    showInfo(stringInfo){
+      let info = "No info";
+      if(stringInfo && stringInfo.length > 0){
+        info = stringInfo;
+      }
+      return info;
+    },
     /**
      * close() : void
      * Emit event 'close' to the parent to hide the modal.
      */
     close() {
-      this.$emit("close");
-    },
-    /**
-     * openModal(idCard : int) : void
-     * @param idCard : int. id of the card that the user wish to open.
-     * Emit event 'openModal' to the parent to open the modal.
-     */
-    openModal(idCard) {
-      this.$emit("openModal", idCard);
+      this.setSelectedCharacterOnVuex({});
     },
     /**
      * searchEpisodesInfo(arrayOfEpisodes : string[]) : void
@@ -160,7 +170,7 @@ export default {
       objEpisode.characters.forEach( async (character, index) => {
         if(index < 3 ){
           let res = await clienteAxios.get(character)
-          this.characters.push(res.data);
+          this.charactersInModal.push(res.data);
         }
       } )
     }
@@ -235,7 +245,7 @@ export default {
         }
         .cont-relleno {
           background-color: #f2f2f2;
-          height: 179px;
+          height: 192px;
         }
         .cont-img-main {
           position: absolute;

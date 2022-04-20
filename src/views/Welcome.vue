@@ -20,8 +20,8 @@
             aplicación mediante el análisis de código y la reproducción del
             siguiente diseño.
           </p>
-          <div class="cont-button-welcome">
-              <router-link to="/home" tag="button" class="btn-1">Continuar</router-link>
+          <div class="cont-button-welcome mt-4">
+              <router-link to="/app/home" tag="button" class="btn-1">Continuar</router-link>
           </div>
         </div>
       </div>
@@ -78,6 +78,9 @@ export default {
       }
       .cont-button-welcome {
         margin: 0 auto;
+        font-family: $secondary-font;
+        font-weight: bold;
+        font-size: 18px;
       }
       .subtext {
         font-family: $main-font;

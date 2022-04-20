@@ -1,69 +1,76 @@
 <template>
-  <div>
-    <!-- CARDS / NOT FOUND CONTAINER -->
-    <div class="cont-cards">
-      <div class="cont-favs-1">
-        <div class="cont-favs-2">
-          <h4 @click="changeRoute('/app/favorites')">Mostrar favoritos:</h4>
+  <body class="animate__animated animate__fadeIn">
+    <header class="header-cont-home">
+      <div class="cont-text-home">
+        <div class="cont-img-rick-and-morty">
           <img
-            src="@/assets/img/home/no-active-star.svg"
-            alt="Star"
-            @click="changeRoute('/app/favorites')"
+            class="animate__animated animate__backInDown img-rick-and-morty"
+            src="@/assets/img/home/rick-and-morty-md.svg"
+            alt="Rick and Morty"
           />
         </div>
-      </div>
-      <div class="container-cards">
-        <template v-if="isThereCharacters">
-          <CardVue
-            @openModal="openModal"
-            :info="character"
-            v-for="(character, index) in characters"
-            v-bind:key="index"
+        <div class="barra-container">
+          <input
+            type="text"
+            class="btn-buscar"
+            @click="searchCharacterByText()"
           />
-        </template>
-        <SpinnerVue v-if="isLoadingCharacters" />
+          <input
+            type="text"
+            class="barra-buscar"
+            v-model="searchCharacterText"
+            placeholder="Buscar personaje..."
+            @keyup.enter="searchCharacterByText()"
+          />
+          <input
+            type="text"
+            class="btn-filtro"
+            @click="showFilters = !showFilters"
+          />
+        </div>
+        <div class="cont-filters" v-show="showFilters">
+          <p class="filter-text">
+            Filtrar por:
+            <span
+              @click="filterBarText = 'Status';"
+              :class="{ selected: filterBarText == 'Status' }"
+              >Status,</span
+            >
+            <span
+              @click="filterBarText = 'Gender';"
+              :class="{ selected: filterBarText == 'Gender' }"
+            >
+              Gender.</span
+            >
+          </p>
+        </div>
       </div>
-      <!-- Not Found -->
-      <no-results
-        v-if="!isLoadingCharacters && !isThereCharacters"
-        @deleteFilters="listenBar"
-        :noResultsObj="noResultsObj"
+    </header>
+    <BarVue @listenLink="listenBar" :filterBar="filterBarText" />
+    <p>{{ gender}}</p>
+    <router-view/>
+    <!-- Modal -->
+      <ModalVue
+        v-if="selectedCharacter.id ? true : false"
+        class="fondo-oscuro animate__animated animate__bounceInRight"
+        :data="selectedCharacter"
       />
-      <!-- Pagination -->
-      <div class="cont-pagination" v-if="!isLoadingCharacters">
-        <button class="btn-1" @click="onChangePage('prev')">Anterior</button>
-        <p>{{ page }}</p>
-        <button class="btn-1" @click="onChangePage('next')">Siguiente</button>
-      </div>
-    </div>
-  </div>
+  </body>
 </template>
 
 <script>
 import "animate.css";
-import CardVue from "@/components/Card.vue";
-import SpinnerVue from "@/components/Spinner.vue";
+import BarVue from "@/components/Bar.vue";
+import ModalVue from "@/components/Modal.vue";
+
 import clienteAxios from "@/config/axios";
-import NotFoundVue from "@/components/NotFound.vue";
-import { actionsMixin } from "@/mixins/actionsMixin.js";
+import {actionsMixin} from "@/mixins/actionsMixin.js";
 
 export default {
-  name: "Home",
-  data() {
-    return {
-      pageName: "/app/home",
-      noResultsObj: {
-        primaryText: "Uh-oh!",
-        secondaryText: "¡Pareces perdido en tu viaje!",
-        thirdText: "Eliminar filtros",
-        showButton: true,
-      },
-    };
-  },
+  name: "ContainerMain",
   components: {
-    CardVue,
-    SpinnerVue,
-    "no-results": NotFoundVue,
+    BarVue,
+    ModalVue
   },
   mixins: [actionsMixin],
   methods: {
@@ -71,22 +78,14 @@ export default {
      * searchCharacterByText() : void
      * Search characters by text on v-model searchCharacterText
      */
-    async searchCharacterByText() {
+    async searchCharacterByText(){
       try {
         this.results = false;
-        this.loading = true;
         let stringFilter = this.getStringFilter();
-        let stringFilters = `/character/?page=${this.page}&name=${this.searchCharacterText}${stringFilter}`;
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        this.charactersArray = characters;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageName,
-          characters,
-        };
-        this.setAllActions(store);
-        this.results = true;
+        let stringFilters =  `/character/?page=${this.page}&name=${this.searchCharacterText}${stringFilter}`;
+        const store = { endPointString: stringFilters, pageName: this.pageName  }
+        await this.setAllActions(store);
+
       } catch (error) {
         console.log("error ", error);
         this.results = false;
@@ -98,12 +97,13 @@ export default {
      * getStringFilter() : string
      * Get the string to filter gender or status. If all, should return ''
      */
-    getStringFilter() {
-      let stringToReturn = "";
+    getStringFilter(){
+      let stringToReturn = '';
       let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
-      if (this.gender === "All") {
-        stringToReturn = "";
-      } else {
+      console.log(" this.gender ", this.gender);
+      if(this.gender === 'All'){
+        stringToReturn = '';
+      }else{
         stringToReturn = `&${genderOrStatusString}=${this.gender}`;
       }
       return stringToReturn;
@@ -115,7 +115,7 @@ export default {
      */
     onChangePage(pageAction) {
       // Page could not be 0
-      if (!this.page || (pageAction === "prev" && this.page == 1)) {
+      if (!this.page || pageAction === "prev" && this.page == 1) {
         return;
       }
       if (pageAction === "next") {
@@ -124,33 +124,24 @@ export default {
       if (pageAction === "prev") {
         this.page--;
       }
-      if (this.searchCharacterText.length > 0) {
+      if(this.searchCharacterText.length > 0){
         this.searchCharacterByText();
       }
       if (this.gender === "All") {
         this.loadOtherCharacters();
-      } else {
+      }else{
         this.searchCharacterText();
       }
     },
     /**
-     * toggleModal() : void
-     * This function is responsible of changing variable 'noModal'. If it's true it assigns to false, if it's false it assigns to true.
-     */
-    toggleModal() {
-      this.noModal = !this.noModal;
-    },
-    /**
-     * listenBar(gender : string) : void
-     * @param gender : string.
+     * listenBar(filterLinkString : string) : void
+     * @param filterLinkString : string.
      * When the user click on the links of the bar, this function is responsible for calling the end points to get the info.
      */
-    listenBar(gender) {
-      // These variables will be used when calling the end point.
-      this.gender = gender;
+    listenBar(filterLinkString) {
       this.page = 1;
-      // Not a gender. Call normal end point.
-      if (gender === "All") {
+      // Not a filterLinkString. Call normal end point.
+      if (filterLinkString === "All") {
         this.loadCharacters();
         return;
       }
@@ -159,19 +150,14 @@ export default {
     async changeCards() {
       try {
         this.results = false;
-        this.loading = true;
         let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
-        let stringFilters = `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`;
+        let stringFilters = `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`
         const res = await clienteAxios.get(stringFilters);
         const characters = res.data.results;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageName,
-          characters,
-        };
+        const store = { endPointString: stringFilters, pageName: this.pageName, characters  }
         this.setAllActions(store);
         this.charactersArray = characters;
-        this.results = true;
+
       } catch (error) {
         console.log("error ", error);
         this.results = false;
@@ -183,36 +169,23 @@ export default {
      * knowIfItIsByGenderOrStatus() : string
      * This function return 'gender' or 'status'. Useful to know what parameters to filter.
      */
-    knowIfItIsByGenderOrStatus() {
-      let stringDecision = "";
-      if (this.filterBar == "Gender") {
-        stringDecision = "gender";
+    knowIfItIsByGenderOrStatus(){
+      let stringDecision = '';
+      if(this.filterBar == 'Gender'){
+        stringDecision = 'gender';
       }
-      if (this.filterBar == "Status") {
-        stringDecision = "status";
+      if(this.filterBar == 'Status'){
+        stringDecision = 'status';
       }
       return stringDecision;
-    },
-    /**
-     * openModal(idCard) : void
-     * Open the Modal even thougn it's already open.
-     */
-    openModal(idCard) {
-      this.searchCardById(idCard);
-      // Cerrar el modal brevemente.
-      this.noModal = true;
-      // After 0.5 sec open the modal.
-      setTimeout(() => {
-        this.noModal = false;
-      }, 500);
     },
     /**
      * searchCardById(idCard : int) : void
      * @param idCard : int.
      * Call an end-point to get info of an especific card by its id.
      */
-    async searchCardById(idCard) {
-      let url = `/character/${idCard}`;
+    async searchCardById(idCard){
+      let url = `/character/${idCard}`
       let res = await clienteAxios.get(url);
       this.dataForModal = res.data;
     },
@@ -221,15 +194,11 @@ export default {
      * This function fills charactersArray variable, to load the characters to be shown, but loads jus the first page.
      */
     async loadCharacters() {
+      if(this.pageName !== "/app/home") return;
       try {
-        this.loading = true;
-        let stringFilters = "/character/?page=1";
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        this.charactersArray = characters;
-        // const store = { endPointString: stringFilters, pageName: this.pageName, characters  }
-        // this.setAllActions(store);
-        this.results = true;
+        let stringFilters = this.endPointString.length > 0 ? this.endPointString :"/character/?page=1";
+        const store = { endPointString: stringFilters, pageName: this.pageName  }
+        await this.setAllActions(store);
       } catch (error) {
         console.log("error ", error);
         this.results = false;
@@ -243,18 +212,9 @@ export default {
      */
     async loadOtherCharacters() {
       try {
-        this.loading = true;
         let stringFilters = `/character/?page=${this.page}`;
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageName,
-          characters,
-        };
-        this.setAllActions(store);
-        this.results = true;
-        this.charactersArray = characters;
+        const store = { endPointString: stringFilters, pageName: this.pageName  }
+        await this.setAllActions(store);
       } catch (error) {
         console.log("error ", error);
         this.results = false;
@@ -262,6 +222,9 @@ export default {
         this.loading = false;
       }
     },
+  },
+  async mounted() {
+    await this.loadCharacters();
   },
 };
 </script>
