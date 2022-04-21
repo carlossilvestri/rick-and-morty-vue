@@ -1,24 +1,37 @@
 <template>
   <div class="cont-not-fount">
-    <h4>{{noResultsObj.primaryText}}</h4>
-    <p>{{noResultsObj.secondaryText}}</p>
-    <button v-if="noResultsObj.showButton" class="btn-1" @click="deleteFilters">{{noResultsObj.thirdText}}</button>
+    <h4>{{ noResultsObj.primaryText }}</h4>
+    <p>{{ noResultsObj.secondaryText }}</p>
+    <button v-if="noResultsObj.showButton" class="btn-1" @click="deleteFilters">
+      {{ noResultsObj.thirdText }}
+    </button>
   </div>
 </template>
 
 <script>
+import { actionsMixin } from "@/mixins/actionsMixin.js";
 export default {
-  name:"NotFoundVue",
+  name: "NotFoundVue",
   props: ["noResultsObj"],
-  methods:{
+  mixins: [actionsMixin],
+  methods: {
     /**
      * deleteFilters() : void
      * This function emits an event to its parent ('deleteFilters').
      */
-    deleteFilters(){
-      this.$emit('deleteFilters', 'All');
-    }
-  }
+    deleteFilters() {
+      // Reset filters
+      let linkFilter = {
+        filterName: "Gender",
+        gender: "All",
+        status: "",
+      };
+      console.log("deleteFilters ");
+      this.setSearchBar("");
+      this.setPage(1);
+      this.setlinkFilterrOnVuex(linkFilter);
+    },
+  },
 };
 </script>
 

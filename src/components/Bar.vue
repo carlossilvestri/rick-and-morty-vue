@@ -80,34 +80,22 @@ export default {
     changeLink(linkClicked) {
       let linkFilterObj = {
         filterName: this.filterName,
-        gender: {
-          name: "All",
-        },
-        status: {
-          name: "",
-        },
+        gender: "All",
+        status: "",
       };
 
       if (this.filterName === "Gender") {
         linkFilterObj = {
           filterName: this.filterName,
-          gender: {
-            name: linkClicked,
-          },
-          status: {
-            name: "",
-          },
+          gender: linkClicked,
+          status: "",
         };
       }
       if (this.filterName === "Status") {
         linkFilterObj = {
           filterName: this.filterName,
-          gender: {
-            name: "",
-          },
-          status: {
-            name: linkClicked,
-          },
+          gender: "",
+          status: linkClicked,
         };
       }
       console.log("linkFilterObj ", linkFilterObj);
@@ -118,6 +106,7 @@ export default {
   },
   watch: {
     link: function(newLink) {
+      console.log("en watch link ", newLink);
       this.$emit("listenLink", newLink);
     },
     filterName: function() {

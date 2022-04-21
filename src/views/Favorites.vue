@@ -55,10 +55,7 @@ export default {
     "no-results": NotFoundVue,
   },
   mixins: [actionsMixin],
-  methods: {},
-  async mounted() {
-    await this.loadCharacters();
-  },
+  methods: {}
 };
 </script>
 

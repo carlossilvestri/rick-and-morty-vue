@@ -61,7 +61,6 @@
 import "animate.css";
 import BarVue from "@/components/Bar.vue";
 import ModalVue from "@/components/Modal.vue";
-
 import clienteAxios from "@/config/axios";
 import { actionsMixin } from "@/mixins/actionsMixin.js";
 
@@ -74,65 +73,20 @@ export default {
   mixins: [actionsMixin],
   methods: {
     /**
-     * searchCharacterByText() : void
-     * Search characters by text on v-model searchCharacterText
-     */
-    async searchCharacterByText() {
-      try {
-        this.results = false;
-        let stringFilter = this.getStringFilter();
-        let stringFilters = `/character/?page=${this.page}&name=${this.searchCharacterText}${stringFilter}`;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageName,
-        };
-        await this.setAllActions(store);
-      } catch (error) {
-        console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
-      }
-    },
-    /**
      * getStringFilter() : string
      * Get the string to filter gender or status. If all, should return ''
      */
     getStringFilter() {
       let stringToReturn = "";
-      let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
       console.log(" this.gender ", this.gender);
-      if (this.gender === "All") {
+      if (this.gender === "All" || this.status === "All") {
         stringToReturn = "";
-      } else {
-        stringToReturn = `&${genderOrStatusString}=${this.gender}`;
+      } else if (this.gender.length > 0) {
+        stringToReturn = `&${this.filterName.toLowerCase()}=${this.gender}`;
+      } else if (this.status.length > 0) {
+        stringToReturn = `&${this.filterName.toLowerCase()}=${this.status}`;
       }
       return stringToReturn;
-    },
-    /**
-     * onChangePage(pageAction : string) : void
-     * @param pageAction : string. 2 possible strings 'prev' decrement page 'next' increment page.
-     * This function is called when the user click on 'Anterior' or 'Siguiente'. This function calls other functions relying on the parameters and validations.
-     */
-    onChangePage(pageAction) {
-      // Page could not be 0
-      if (!this.page || (pageAction === "prev" && this.page == 1)) {
-        return;
-      }
-      if (pageAction === "next") {
-        this.page++;
-      }
-      if (pageAction === "prev") {
-        this.page--;
-      }
-      if (this.searchCharacterText.length > 0) {
-        this.searchCharacterByText();
-      }
-      if (this.gender === "All") {
-        this.loadOtherCharacters();
-      } else {
-        this.searchCharacterText();
-      }
     },
     /**
      * listenBar(filterLinkString : string) : void
@@ -140,12 +94,14 @@ export default {
      * When the user click on the links of the bar, this function is responsible for calling the end points to get the info.
      */
     listenBar(filterLinkString) {
-      this.page = 1;
+      console.log("filterLinkString ", filterLinkString);
       // Not a filterLinkString. Call normal end point.
+      /*
       if (filterLinkString === "All") {
         this.loadCharacters();
         return;
       }
+      */
       this.searchCharacterByText();
     },
     async changeCards() {
@@ -153,11 +109,12 @@ export default {
         this.results = false;
         let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
         let stringFilters = `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`;
+        console.log("En changeCards ", stringFilters);
         const res = await clienteAxios.get(stringFilters);
         const characters = res.data.results;
         const store = {
           endPointString: stringFilters,
-          pageName: this.pageName,
+          pageName: this.pageNameFromVuex,
           characters,
         };
         this.setAllActions(store);
@@ -168,20 +125,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    /**
-     * knowIfItIsByGenderOrStatus() : string
-     * This function return 'gender' or 'status'. Useful to know what parameters to filter.
-     */
-    knowIfItIsByGenderOrStatus() {
-      let stringDecision = "";
-      if (this.filterBar == "Gender") {
-        stringDecision = "gender";
-      }
-      if (this.filterBar == "Status") {
-        stringDecision = "status";
-      }
-      return stringDecision;
     },
     /**
      * searchCardById(idCard : int) : void
@@ -198,7 +141,8 @@ export default {
      * This function fills charactersArray variable, to load the characters to be shown, but loads jus the first page.
      */
     async loadCharacters() {
-      if (this.pageName !== "/app/home") return;
+      // If the user is not in "/app/home", don't load call the api.
+      if (this.pageNameFromVuexFromVuex !== "/app/home") return;
       try {
         let stringFilters =
           this.endPointString.length > 0
@@ -206,7 +150,7 @@ export default {
             : "/character/?page=1";
         const store = {
           endPointString: stringFilters,
-          pageName: this.pageName,
+          pageName: this.pageNameFromVuex,
         };
         await this.setAllActions(store);
       } catch (error) {
@@ -221,11 +165,12 @@ export default {
      * This function fills charactersArray variable, to load the characters to be shown. It loads by page.
      */
     async loadOtherCharacters() {
+      console.log("En loadOtherCharacters ");
       try {
         let stringFilters = `/character/?page=${this.page}`;
         const store = {
           endPointString: stringFilters,
-          pageName: this.pageNameFromVuex,
+          pageName: this.pageNameFromVuexFromVuex,
         };
         await this.setAllActions(store);
       } catch (error) {
@@ -241,8 +186,19 @@ export default {
     await this.loadCharacters();
   },
   watch: {
-    searchCharacterText: function(searchString) {
-      this.setSearchBar(searchString)
+    searchCharacterText: function (searchString) {
+      this.setSearchBar(searchString);
+    },
+    searchBar: function (searchString) {
+      this.searchCharacterText = searchString;
+      if(this.pageNameFromVuex !== "/app/home") return;
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+      this.timeout = setTimeout(() => {
+        // TODO: Buscar o ejecutar algo.
+        this.searchCharacterByText();
+      }, 1000);
     },
   },
 };

@@ -12,8 +12,9 @@
           />
         </div>
       </div>
+      <button class="scroll-down" @click="goTo('pagination')"  data-toggle="tooltip" data-placement="bottom" title="Ir abajo"></button>
       <div class="container-cards">
-        <template v-if="isThereCharacters">
+        <template v-if="isThereCharacters && !isLoadingCharacters">
           <CardVue
             @openModal="openModal"
             :info="character"
@@ -26,13 +27,12 @@
       <!-- Not Found -->
       <no-results
         v-if="!isLoadingCharacters && !isThereCharacters"
-        @deleteFilters="listenBar"
         :noResultsObj="noResultsObj"
       />
       <!-- Pagination -->
-      <div class="cont-pagination" v-if="!isLoadingCharacters">
+      <div class="cont-pagination" v-if="!isLoadingCharacters" ref="pagination">
         <button class="btn-1" @click="onChangePage('prev')">Anterior</button>
-        <p>{{ page }}</p>
+        <p class="mb-0 mx-3">{{ page }}</p>
         <button class="btn-1" @click="onChangePage('next')">Siguiente</button>
       </div>
     </div>
@@ -73,51 +73,30 @@ export default {
      */
     async searchCharacterByText() {
       try {
-        this.results = false;
-        this.loading = true;
         let stringFilter = this.getStringFilter();
-        let stringFilters = `/character/?page=${this.page}&name=${this.searchCharacterText}${stringFilter}`;
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        this.charactersArray = characters;
+        let stringFilters = `/character/?page=${this.page}&name=${this.searchBar}${stringFilter}`;
         const store = {
           endPointString: stringFilters,
-          pageName: this.pageName,
-          characters,
+          pageName: this.pageNameFromVuex
         };
-        this.setAllActions(store);
-        this.results = true;
+        this.setIsLoadingCharacters(true);
+        await this.setAllActions(store);
       } catch (error) {
         console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
       }
-    },
-    /**
-     * getStringFilter() : string
-     * Get the string to filter gender or status. If all, should return ''
-     */
-    getStringFilter() {
-      let stringToReturn = "";
-      let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
-      if (this.gender === "All") {
-        stringToReturn = "";
-      } else {
-        stringToReturn = `&${genderOrStatusString}=${this.gender}`;
-      }
-      return stringToReturn;
     },
     /**
      * onChangePage(pageAction : string) : void
      * @param pageAction : string. 2 possible strings 'prev' decrement page 'next' increment page.
      * This function is called when the user click on 'Anterior' or 'Siguiente'. This function calls other functions relying on the parameters and validations.
      */
-    onChangePage(pageAction) {
+    async onChangePage(pageAction) {
       console.log("this.page ", this.page);
       console.log("pageAction", pageAction);
+      console.log("searchBar ", this.searchBar);
+      console.log("this.searchBar.length > 0 ", this.searchBar.length > 0);
       // Page could not be 0
-      if (!this.page || (pageAction === "prev" && this.page == 1)) {
+      if (!this.page || (pageAction === "prev" && this.page === 1)) {
         return;
       }
       if (pageAction === "next") {
@@ -126,14 +105,7 @@ export default {
       if (pageAction === "prev") {
         this.setPage(this.page - 1);
       }
-      if (this.searchCharacterText.length > 0) {
-        this.searchCharacterByText();
-      }
-      if (this.gender === "All") {
-        this.loadOtherCharacters();
-      } else {
-        this.searchCharacterText();
-      }
+      await this.searchCharacterByText();
     },
     /**
      * toggleModal() : void
@@ -141,22 +113,6 @@ export default {
      */
     toggleModal() {
       this.noModal = !this.noModal;
-    },
-    /**
-     * listenBar(gender : string) : void
-     * @param gender : string.
-     * When the user click on the links of the bar, this function is responsible for calling the end points to get the info.
-     */
-    listenBar(gender) {
-      // These variables will be used when calling the end point.
-      this.gender = gender;
-      this.page = 1;
-      // Not a gender. Call normal end point.
-      if (gender === "All") {
-        this.loadCharacters();
-        return;
-      }
-      this.searchCharacterByText();
     },
     async changeCards() {
       try {
@@ -271,6 +227,9 @@ export default {
 <style lang="scss">
 @import "~@/scss/_variables.scss";
 @import "~@/scss/utilities.scss";
+
+
+
 .header-cont-home {
   display: block;
   overflow: hidden;

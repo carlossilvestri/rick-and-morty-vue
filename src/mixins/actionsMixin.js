@@ -11,37 +11,42 @@ export const actionsMixin = {
       dataForModal: {},
       searchCharacterText: "",
       filterBarText: "Gender",
-      showFilters: true
+      showFilters: true,
+      timeout: null
     };
   },
-  computed: mapGetters({
-    characters: "characters",
-    gender: "gender",
-    status: "status",
-    page: "page",
-    searchBar: "searchBar",
-    linkFilter: "linkFilter",
-    filterName: "filterName",
-    isThereCharacters: "isThereCharacters",
-    isThereFavoriteCharacters: "isThereFavoriteCharacters",
-    isLoadingCharacters: "isLoadingCharacters",
-    favoriteCharacters: "favoriteCharacters",
-    selectedCharacter: "selectedCharacter",
-    pageNameFromVuex: "pageName",
-    isTherePageName: "isTherePageName",
-    endPointString: "endPointString",
-  }),
+  computed: {
+    ...mapGetters({
+      characters: "characters",
+      gender: "gender",
+      status: "status",
+      page: "page",
+      searchBar: "searchBar",
+      linkFilter: "linkFilter",
+      filterName: "filterName",
+      isThereCharacters: "isThereCharacters",
+      isThereFavoriteCharacters: "isThereFavoriteCharacters",
+      isLoadingCharacters: "isLoadingCharacters",
+      favoriteCharacters: "favoriteCharacters",
+      selectedCharacter: "selectedCharacter",
+      pageNameFromVuex: "pageName",
+      isTherePageName: "isTherePageName",
+      endPointString: "endPointString",
+    }),
+  },
+
   methods: {
     ...mapActions({
       setCharactersAsync: "setCharactersAsync",
       setFilterName: "setFilterName",
       setSearchBar: "setSearchBar",
-      setPage: "setPage"
-          }),
+      setIsLoadingCharacters: "setIsLoadingCharacters",
+      setPage: "setPage",
+    }),
     /**
      * This method is used to set pageName to vuex store and move to that route.
      * return void
-     * @param string newRoute 
+     * @param string newRoute
      */
     changeRoute(newRoute) {
       this.setPageNameOnVuex(newRoute);
@@ -68,7 +73,7 @@ export const actionsMixin = {
      * setGenderOnVuex() : void
      * @param linkFilter : linkFilter
      */
-     setlinkFilterrOnVuex(linkFilter) {
+    setlinkFilterrOnVuex(linkFilter) {
       this.$store.dispatch("setlinkFilter", linkFilter);
     },
     /**
@@ -113,8 +118,43 @@ export const actionsMixin = {
         this.setSelectedCharacterOnVuex(this.info);
       }, 300);
     },
-    isObjEmpty(obj) {
-      return Object.keys(obj).length === 0;
+    /** Othher functions */
+    /**
+     * searchCharacterByText() : void
+     * Search characters by text on v-model searchCharacterText
+     */
+    async searchCharacterByText() {
+      try {
+        let stringFilter = this.getStringFilter();
+        let stringFilters = `/character/?page=${this.page}&name=${this.searchBar}${stringFilter}`;
+        const store = {
+          endPointString: stringFilters,
+          pageName: this.pageNameFromVuex,
+        };
+        await this.setAllActions(store);
+      } catch (error) {
+        console.log("error ", error);
+      }
     },
+    /**
+     * getStringFilter() : string
+     * Get the string to filter gender or status. If all, should return ''
+     */
+    getStringFilter() {
+      let stringToReturn = "";
+      if (this.gender === "All" || this.status === "All") {
+        stringToReturn = "";
+      } else if (this.gender.length > 0) {
+        stringToReturn = `&${this.filterName.toLowerCase()}=${this.gender}`;
+      } else if (this.status.length > 0) {
+        stringToReturn = `&${this.filterName.toLowerCase()}=${this.status}`;
+      }
+      return stringToReturn;
+    },
+    goTo(refName) {
+      let element = this.$refs[refName];
+      let top = element.offsetTop;
+      window.scrollTo(0, top);
+    }
   },
 };

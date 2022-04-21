@@ -4,6 +4,7 @@
       <div class="cont-img-card">
         <img
           data-testId="image"
+          loading="lazy"
           :src="info.image"
           alt="Morty"
           class="character-show"
