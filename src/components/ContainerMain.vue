@@ -196,7 +196,7 @@ export default {
         clearTimeout(this.timeout);
       }
       this.timeout = setTimeout(() => {
-        // TODO: Buscar o ejecutar algo.
+        this.setPage(1);
         this.searchCharacterByText();
       }, 1000);
     },
