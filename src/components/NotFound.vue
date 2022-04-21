@@ -19,17 +19,15 @@ export default {
      * deleteFilters() : void
      * This function emits an event to its parent ('deleteFilters').
      */
-    deleteFilters() {
+    async deleteFilters() {
       // Reset filters
-      let linkFilter = {
-        filterName: "Gender",
-        gender: "All",
-        status: "",
-      };
-      console.log("deleteFilters ");
-      this.setSearchBar("");
-      this.setPage(1);
-      this.setlinkFilterrOnVuex(linkFilter);
+      this.resetLinkFilter();
+      this.setPage(1); // Not auto update...
+      if (this.searchBar.length === 0) {
+        await this.updateSearch();
+        return;
+      }
+      this.setSearchBar(""); // Call automatically the api if there was a change (auto update).
     },
   },
 };

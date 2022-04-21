@@ -104,7 +104,6 @@ export const store = new Vuex.Store({
      * @param boolean : isLoadingCharacters
      */
     setIsLoadingCharacters: (state, isLoadingCharacters) => {
-      console.log("En setIsLoadingCharacters ", isLoadingCharacters);
       state.isLoadingCharacters = isLoadingCharacters;
     },
     /**
@@ -189,7 +188,6 @@ export const store = new Vuex.Store({
      * @param string : searchBar
      */
     setSearchBar: (context, searchBar) => {
-      console.log("setSearchBaren action setSearchBar");
       context.commit("setSearchBar", searchBar);
     },
     /**
@@ -211,7 +209,7 @@ export const store = new Vuex.Store({
       await setTimeout(async () => {
         try {
           const res = await clienteAxios.get(endPoint);
-          const characters = res.data.results;
+          const characters = res.data.results ? res.data.results : res.data;
           context.commit("setCharacters", characters);
         } catch (error) {
           console.log("error ", error);

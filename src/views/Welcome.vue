@@ -21,7 +21,7 @@
             siguiente diseño.
           </p>
           <div class="cont-button-welcome mt-4">
-              <router-link to="/app/home" tag="button" class="btn-1">Continuar</router-link>
+              <router-link :to="homeDirectoryPath" tag="button" class="btn-1">Continuar</router-link>
           </div>
         </div>
       </div>

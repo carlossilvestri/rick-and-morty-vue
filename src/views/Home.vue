@@ -1,16 +1,18 @@
 <template>
-  <div>
+  <div class="animate__animated animate__fadeIn">
     <!-- CARDS / NOT FOUND CONTAINER -->
     <div class="cont-cards">
-      <div class="cont-favs-1">
+      <div class="cont-favs-1 d-flex align-items-center justify-content-around">
         <div class="cont-favs-2">
-          <h4 @click="changeRoute('/app/favorites')">Mostrar favoritos:</h4>
+          <h4>Mostrar favoritos:</h4>
           <img
             src="@/assets/img/home/no-active-star.svg"
             alt="Star"
-            @click="changeRoute('/app/favorites')"
+            @click="changeRoute(favoritePath)"
           />
         </div>
+        <button class="btn-1 me-2" @click="deleteFilters()">Resetear filtros</button>
+        <button class="btn-1 me-2" @click="getRandomCharacters(25)">Mostrar personajes al azar</button>
       </div>
       <button class="scroll-down" @click="goTo('pagination')"  data-toggle="tooltip" data-placement="bottom" title="Ir abajo"></button>
       <div class="container-cards">
@@ -68,33 +70,11 @@ export default {
   mixins: [actionsMixin],
   methods: {
     /**
-     * searchCharacterByText() : void
-     * Search characters by text on v-model searchCharacterText
-     */
-    async searchCharacterByText() {
-      try {
-        let stringFilter = this.getStringFilter();
-        let stringFilters = `/character/?page=${this.page}&name=${this.searchBar}${stringFilter}`;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageNameFromVuex
-        };
-        this.setIsLoadingCharacters(true);
-        await this.setAllActions(store);
-      } catch (error) {
-        console.log("error ", error);
-      }
-    },
-    /**
      * onChangePage(pageAction : string) : void
      * @param pageAction : string. 2 possible strings 'prev' decrement page 'next' increment page.
      * This function is called when the user click on 'Anterior' or 'Siguiente'. This function calls other functions relying on the parameters and validations.
      */
     async onChangePage(pageAction) {
-      console.log("this.page ", this.page);
-      console.log("pageAction", pageAction);
-      console.log("searchBar ", this.searchBar);
-      console.log("this.searchBar.length > 0 ", this.searchBar.length > 0);
       // Page could not be 0
       if (!this.page || (pageAction === "prev" && this.page === 1)) {
         return;
@@ -105,51 +85,7 @@ export default {
       if (pageAction === "prev") {
         this.setPage(this.page - 1);
       }
-      await this.searchCharacterByText();
-    },
-    /**
-     * toggleModal() : void
-     * This function is responsible of changing variable 'noModal'. If it's true it assigns to false, if it's false it assigns to true.
-     */
-    toggleModal() {
-      this.noModal = !this.noModal;
-    },
-    async changeCards() {
-      try {
-        this.results = false;
-        this.loading = true;
-        let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
-        let stringFilters = `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`;
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageName,
-          characters,
-        };
-        this.setAllActions(store);
-        this.charactersArray = characters;
-        this.results = true;
-      } catch (error) {
-        console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
-      }
-    },
-    /**
-     * knowIfItIsByGenderOrStatus() : string
-     * This function return 'gender' or 'status'. Useful to know what parameters to filter.
-     */
-    knowIfItIsByGenderOrStatus() {
-      let stringDecision = "";
-      if (this.filterBar == "Gender") {
-        stringDecision = "gender";
-      }
-      if (this.filterBar == "Status") {
-        stringDecision = "status";
-      }
-      return stringDecision;
+      await this.updateSearch();
     },
     /**
      * openModal(idCard) : void
@@ -173,52 +109,6 @@ export default {
       let url = `/character/${idCard}`;
       let res = await clienteAxios.get(url);
       this.dataForModal = res.data;
-    },
-    /**
-     * loadCharacters() : void
-     * This function fills charactersArray variable, to load the characters to be shown, but loads jus the first page.
-     */
-    async loadCharacters() {
-      try {
-        this.loading = true;
-        let stringFilters = "/character/?page=1";
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        this.charactersArray = characters;
-        // const store = { endPointString: stringFilters, pageName: this.pageName, characters  }
-        // this.setAllActions(store);
-        this.results = true;
-      } catch (error) {
-        console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
-      }
-    },
-    /**
-     * loadOtherCharacters() : void
-     * This function fills charactersArray variable, to load the characters to be shown. It loads by page.
-     */
-    async loadOtherCharacters() {
-      try {
-        this.loading = true;
-        let stringFilters = `/character/?page=${this.page}`;
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageName,
-          characters,
-        };
-        this.setAllActions(store);
-        this.results = true;
-        this.charactersArray = characters;
-      } catch (error) {
-        console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
-      }
     },
   },
 };

@@ -98,16 +98,13 @@ export default {
           status: linkClicked,
         };
       }
-      console.log("linkFilterObj ", linkFilterObj);
       this.setlinkFilterrOnVuex(linkFilterObj);
-      console.log("linkClicked ", linkClicked);
       this.link = linkClicked;
     },
   },
   watch: {
-    link: function(newLink) {
-      console.log("en watch link ", newLink);
-      this.$emit("listenLink", newLink);
+    link: function() {
+      this.updateSearch();
     },
     filterName: function() {
       this.changeLink("All");

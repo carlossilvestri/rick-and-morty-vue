@@ -13,14 +13,14 @@
           <input
             type="text"
             class="btn-buscar"
-            @click="searchCharacterByText()"
+            @click="updateSearch()"
           />
           <input
             type="text"
             class="barra-buscar"
             v-model="searchCharacterText"
             placeholder="Buscar personaje..."
-            @keyup.enter="searchCharacterByText()"
+            @keyup.enter="updateSearch()"
           />
           <input
             type="text"
@@ -46,7 +46,7 @@
         </div>
       </div>
     </header>
-    <BarVue @listenLink="listenBar" />
+    <BarVue />
     <router-view />
     <!-- Modal -->
     <ModalVue
@@ -61,7 +61,6 @@
 import "animate.css";
 import BarVue from "@/components/Bar.vue";
 import ModalVue from "@/components/Modal.vue";
-import clienteAxios from "@/config/axios";
 import { actionsMixin } from "@/mixins/actionsMixin.js";
 
 export default {
@@ -73,76 +72,12 @@ export default {
   mixins: [actionsMixin],
   methods: {
     /**
-     * getStringFilter() : string
-     * Get the string to filter gender or status. If all, should return ''
-     */
-    getStringFilter() {
-      let stringToReturn = "";
-      console.log(" this.gender ", this.gender);
-      if (this.gender === "All" || this.status === "All") {
-        stringToReturn = "";
-      } else if (this.gender.length > 0) {
-        stringToReturn = `&${this.filterName.toLowerCase()}=${this.gender}`;
-      } else if (this.status.length > 0) {
-        stringToReturn = `&${this.filterName.toLowerCase()}=${this.status}`;
-      }
-      return stringToReturn;
-    },
-    /**
-     * listenBar(filterLinkString : string) : void
-     * @param filterLinkString : string.
-     * When the user click on the links of the bar, this function is responsible for calling the end points to get the info.
-     */
-    listenBar(filterLinkString) {
-      console.log("filterLinkString ", filterLinkString);
-      // Not a filterLinkString. Call normal end point.
-      /*
-      if (filterLinkString === "All") {
-        this.loadCharacters();
-        return;
-      }
-      */
-      this.searchCharacterByText();
-    },
-    async changeCards() {
-      try {
-        this.results = false;
-        let genderOrStatusString = this.knowIfItIsByGenderOrStatus();
-        let stringFilters = `/character/?page=${this.page}&${genderOrStatusString}=${this.gender}`;
-        console.log("En changeCards ", stringFilters);
-        const res = await clienteAxios.get(stringFilters);
-        const characters = res.data.results;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageNameFromVuex,
-          characters,
-        };
-        this.setAllActions(store);
-        this.charactersArray = characters;
-      } catch (error) {
-        console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
-      }
-    },
-    /**
-     * searchCardById(idCard : int) : void
-     * @param idCard : int.
-     * Call an end-point to get info of an especific card by its id.
-     */
-    async searchCardById(idCard) {
-      let url = `/character/${idCard}`;
-      let res = await clienteAxios.get(url);
-      this.dataForModal = res.data;
-    },
-    /**
      * loadCharacters() : void
      * This function fills charactersArray variable, to load the characters to be shown, but loads jus the first page.
      */
     async loadCharacters() {
       // If the user is not in "/app/home", don't load call the api.
-      if (this.pageNameFromVuexFromVuex !== "/app/home") return;
+      if (this.pageNameFromVuex !== this.homeDirectoryPath) return;
       try {
         let stringFilters =
           this.endPointString.length > 0
@@ -155,29 +90,6 @@ export default {
         await this.setAllActions(store);
       } catch (error) {
         console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
-      }
-    },
-    /**
-     * loadOtherCharacters() : void
-     * This function fills charactersArray variable, to load the characters to be shown. It loads by page.
-     */
-    async loadOtherCharacters() {
-      console.log("En loadOtherCharacters ");
-      try {
-        let stringFilters = `/character/?page=${this.page}`;
-        const store = {
-          endPointString: stringFilters,
-          pageName: this.pageNameFromVuexFromVuex,
-        };
-        await this.setAllActions(store);
-      } catch (error) {
-        console.log("error ", error);
-        this.results = false;
-      } finally {
-        this.loading = false;
       }
     },
   },
@@ -191,13 +103,13 @@ export default {
     },
     searchBar: function (searchString) {
       this.searchCharacterText = searchString;
-      if(this.pageNameFromVuex !== "/app/home") return;
+      if (this.pageNameFromVuex !== this.homeDirectoryPath) return;
       if (this.timeout) {
         clearTimeout(this.timeout);
       }
       this.timeout = setTimeout(() => {
         this.setPage(1);
-        this.searchCharacterByText();
+        this.updateSearch();
       }, 1000);
     },
   },
