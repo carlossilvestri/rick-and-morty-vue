@@ -2,7 +2,7 @@
   <div class="animate__animated animate__fadeIn">
     <!-- CARDS / NOT FOUND CONTAINER -->
     <div class="cont-cards">
-      <div class="cont-favs-1">
+      <div class="cont-favs-1-f">
         <div class="cont-favs-2">
           <h4>Mostrar favoritos:</h4>
           <img
@@ -113,4 +113,36 @@ export default {
 <style lang="scss">
 @import "~@/scss/_variables.scss";
 @import "~@/scss/utilities.scss";
+
+.cont-cards {
+  .cont-favs-1-f {
+    .cont-favs-2 {
+      max-width: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      h4 {
+        font-family: $main-font;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 17px;
+        text-align: center;
+        color: #000000;
+        margin: 40px 10px 40px 20px;
+      }
+      img {
+        cursor: pointer;
+      }
+    }
+  }
+  .container-cards {
+    margin: 0 auto;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    // justify-content: center;
+    align-items: center;
+  }
+}
 </style>

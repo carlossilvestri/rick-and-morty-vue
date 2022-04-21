@@ -2,7 +2,9 @@
   <div class="animate__animated animate__fadeIn">
     <!-- CARDS / NOT FOUND CONTAINER -->
     <div class="cont-cards">
-      <div class="cont-favs-1 d-flex align-items-center justify-content-around">
+      <div
+        class="cont-favs-1"
+      >
         <div class="cont-favs-2">
           <h4>Mostrar favoritos:</h4>
           <img
@@ -11,10 +13,20 @@
             @click="changeRoute(favoritePath)"
           />
         </div>
-        <button class="btn-1 me-2" @click="deleteFilters()">Resetear filtros</button>
-        <button class="btn-1 me-2" @click="getRandomCharacters(25)">Mostrar personajes al azar</button>
+        <button class="btn-1 me-2 mb-2" @click="deleteFilters()">
+          Resetear filtros
+        </button>
+        <button class="btn-1 me-2 mb-2" @click="getRandomCharacters(25)">
+          Mostrar personajes al azar
+        </button>
       </div>
-      <button class="scroll-down" @click="goTo('pagination')"  data-toggle="tooltip" data-placement="bottom" title="Ir abajo"></button>
+      <button
+        class="scroll-down"
+        @click="goTo('pagination')"
+        data-toggle="tooltip"
+        data-placement="bottom"
+        title="Ir abajo"
+      ></button>
       <div class="container-cards">
         <template v-if="isThereCharacters && !isLoadingCharacters">
           <CardVue
@@ -118,8 +130,6 @@ export default {
 @import "~@/scss/_variables.scss";
 @import "~@/scss/utilities.scss";
 
-
-
 .header-cont-home {
   display: block;
   overflow: hidden;
@@ -183,6 +193,12 @@ export default {
 }
 .cont-cards {
   .cont-favs-1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    @media screen and (max-width: 720px) {
+      flex-direction: column;
+    }
     .cont-favs-2 {
       max-width: 300px;
       display: flex;
