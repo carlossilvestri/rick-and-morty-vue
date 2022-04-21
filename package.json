@@ -5,8 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit",
-    "test:watch": "vue-cli-service test:unit --watch --notify",
+    "test": "vue-cli-service test:unit",
+    "test:watch": "vue-cli-service test:unit --verbose --watchAll",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "flush-promises": "^1.0.2",
     "node-sass": "^4.14.1",
     "sass": "^1.35.1",
     "sass-loader": "^7.1.0",
