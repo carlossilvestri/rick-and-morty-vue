@@ -29,9 +29,11 @@
 </template>
 
 <script>
-import "animate.css"
+import "animate.css";
+import { actionsMixin } from "@/mixins/actionsMixin.js";
 export default {
   name: "Welcome",
+  mixins: [actionsMixin],
 };
 </script>
 
