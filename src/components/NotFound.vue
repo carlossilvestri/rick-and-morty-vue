@@ -1,23 +1,35 @@
 <template>
   <div class="cont-not-fount">
-    <h4>Uh-oh!</h4>
-    <p>¡Pareces perdido en tu viaje!</p>
-    <button class="btn-1" @click="deleteFilters">Eliminar filtros</button>
+    <h4>{{ noResultsObj.primaryText }}</h4>
+    <p>{{ noResultsObj.secondaryText }}</p>
+    <button v-if="noResultsObj.showButton" class="btn-1" @click="deleteFilters">
+      {{ noResultsObj.thirdText }}
+    </button>
   </div>
 </template>
 
 <script>
+import { actionsMixin } from "@/mixins/actionsMixin.js";
 export default {
-  name:"NotFoundVue",
-  methods:{
+  name: "NotFoundVue",
+  props: ["noResultsObj"],
+  mixins: [actionsMixin],
+  methods: {
     /**
      * deleteFilters() : void
      * This function emits an event to its parent ('deleteFilters').
      */
-    deleteFilters(){
-      this.$emit('deleteFilters', 'All');
-    }
-  }
+    async deleteFilters() {
+      // Reset filters
+      this.resetLinkFilter();
+      this.setPage(1); // Not auto update...
+      if (this.searchBar.length === 0) {
+        await this.updateSearch();
+        return;
+      }
+      this.setSearchBar(""); // Call automatically the api if there was a change (auto update).
+    },
+  },
 };
 </script>
 

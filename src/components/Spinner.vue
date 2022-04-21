@@ -1,11 +1,13 @@
 <template>
-  <div class="sk-chase">
-    <div class="sk-chase-dot"></div>
-    <div class="sk-chase-dot"></div>
-    <div class="sk-chase-dot"></div>
-    <div class="sk-chase-dot"></div>
-    <div class="sk-chase-dot"></div>
-    <div class="sk-chase-dot"></div>
+  <div class="cont-spinner">
+    <div class="sk-chase">
+      <div class="sk-chase-dot"></div>
+      <div class="sk-chase-dot"></div>
+      <div class="sk-chase-dot"></div>
+      <div class="sk-chase-dot"></div>
+      <div class="sk-chase-dot"></div>
+      <div class="sk-chase-dot"></div>
+    </div>
   </div>
 </template>
 
@@ -17,12 +19,16 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/scss/_variables.scss";
+.cont-spinner{
+    margin: 10vw auto;
+    height: 40vh;
+}
 .sk-chase {
   width: 40px;
   height: 40px;
   position: relative;
   animation: sk-chase 2.5s infinite linear both;
-  margin: 100px auto;
+  margin: 0 auto;
 }
 
 .sk-chase-dot {
