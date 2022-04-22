@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="cont-modal-main">
-      <div class="tajeta" style="height: auto;">
+      <div class="tajeta" style="height: auto">
         <div class="container-elements-tarjeta diferencias-1">
           <div class="flex-elemts">
             <div class="cont-img-background">
@@ -41,7 +41,9 @@
                 <div class="cont-ball">
                   <p class="soft-text">
                     <span
-                      ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
+                      ><img
+                        src="@/assets/img/modal/info.jpg"
+                        alt="Info" /></span
                     >Gender:
                   </p>
                   <h3 class="strong-text">{{ showInfo(data.gender) }}</h3>
@@ -49,7 +51,9 @@
                 <div class="cont-ball">
                   <p class="soft-text">
                     <span
-                      ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
+                      ><img
+                        src="@/assets/img/modal/info.jpg"
+                        alt="Info" /></span
                     >Origin:
                   </p>
                   <h3 class="strong-text">{{ showInfo(data.origin.name) }}</h3>
@@ -57,7 +61,9 @@
                 <div class="cont-ball">
                   <p class="soft-text">
                     <span
-                      ><img src="@/assets/img/modal/info.jpg" alt="Info"/></span
+                      ><img
+                        src="@/assets/img/modal/info.jpg"
+                        alt="Info" /></span
                     >Type:
                   </p>
                   <h3 class="strong-text">{{ showInfo(data.type) }}</h3>
@@ -68,25 +74,16 @@
               <div class="cont-title-info">
                 <h4>Episodios</h4>
               </div>
-              <div
-                v-for="(episode, index) in arrayOfEpisodesLoaded"
-                v-bind:key="`Episode-${index}`"
-              >
+              <div>
                 <div class="cont-info-balls">
-                  <div class="cont-ball">
+                  <div
+                    v-for="(episode, index) in arrayOfEpisodesLoaded"
+                    v-bind:key="`Episode-${index}`"
+                    class="cont-ball"
+                  >
                     <p class="soft-text">{{ episode.name }}</p>
                     <h3 class="strong-text">{{ episode.episode }}</h3>
-                    <p class="soft-text">{{ episode.air_date }}</p>
-                  </div>
-                  <div class="cont-ball">
-                    <p class="soft-text">Pilot</p>
-                    <h3 class="strong-text">S01E01</h3>
-                    <p class="soft-text">DECEMBER 2, 2013</p>
-                  </div>
-                  <div class="cont-ball">
-                    <p class="soft-text">Pilot</p>
-                    <h3 class="strong-text">S01E01</h3>
-                    <p class="soft-text">DECEMBER 2, 2013</p>
+                    <p class="soft-text">{{ showInfo(episode.air_date).toUpperCase() }}</p>
                   </div>
                 </div>
               </div>
@@ -115,7 +112,7 @@
 </template>
 
 <script>
-import {actionsMixin} from "@/mixins/actionsMixin.js";
+import { actionsMixin } from "@/mixins/actionsMixin.js";
 import CardVue from "@/components/Card.vue";
 import clienteAxios from "@/config/axios";
 
@@ -133,9 +130,9 @@ export default {
     this.searchEpisodesInfo(this.data.episode);
   },
   methods: {
-    showInfo(stringInfo){
+    showInfo(stringInfo) {
       let info = "No info";
-      if(stringInfo && stringInfo.length > 0){
+      if (stringInfo && stringInfo.length > 0) {
         info = stringInfo;
       }
       return info;
@@ -156,7 +153,7 @@ export default {
       arrayOfEpisodes.forEach(async (episode, index) => {
         let res = await clienteAxios.get(episode);
         this.arrayOfEpisodesLoaded.push(res.data);
-        if(index == 0){
+        if (index == 0) {
           this.searchCharacters(this.arrayOfEpisodesLoaded[0]);
         }
       });
@@ -166,14 +163,14 @@ export default {
      * @param objEpisode : Object. Object that contains an array of characters.
      * This function fills the variable 'characters', using the end-point given, (Just 3 are needed).
      */
-    searchCharacters(objEpisode){
-      objEpisode.characters.forEach( async (character, index) => {
-        if(index < 3 ){
-          let res = await clienteAxios.get(character)
+    searchCharacters(objEpisode) {
+      objEpisode.characters.forEach(async (character, index) => {
+        if (index < 3) {
+          let res = await clienteAxios.get(character);
           this.charactersInModal.push(res.data);
         }
-      } )
-    }
+      });
+    },
   },
   components: {
     CardVue,
@@ -214,6 +211,10 @@ export default {
       border-radius: 10px;
       overflow-y: auto;
       scroll-behavior: smooth;
+      @media (max-width: 425px) {
+        width: 90vw;
+        padding: 0 !important;
+      }
       &::-webkit-scrollbar {
         width: 0px;
         height: 12px;
@@ -252,6 +253,9 @@ export default {
           top: 115px;
           right: 39%;
           max-width: 200px;
+          @media (max-width: 425px) {
+            right: 29%;
+          }
           .img-character {
             border: 4px solid #fffbfb;
             box-sizing: border-box;
@@ -318,6 +322,7 @@ export default {
           align-items: center;
           justify-content: space-between;
           margin: 10px 15px;
+          flex-wrap: wrap;
           .cont-ball {
             display: flex;
             flex-direction: column;
@@ -330,6 +335,7 @@ export default {
             height: 68px;
             text-align: left;
             padding: 5px;
+            margin: 10px;
             .soft-text {
               font-size: 11px;
               margin: 0;
