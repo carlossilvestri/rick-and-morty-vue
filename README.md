@@ -12,7 +12,7 @@
 ![Welcome Page](https://res.cloudinary.com/silvestric/image/upload/v1650568612/img-rick-and-morty-project/Home_Page_mesf5x.png "Home Page")
 
 ### 3.- Favorites Page
-![Welcome Page](https://res.cloudinary.com/silvestric/image/upload/v1650568612/img-rick-and-morty-project/Home_Page_mesf5x.png "Home Page")
+![Favorites Page](https://res.cloudinary.com/silvestric/image/upload/v1650636987/img-rick-and-morty-project/FavoritesPage_hjilvb.png "Favorites Page")
 
 ## Project setup
 ```

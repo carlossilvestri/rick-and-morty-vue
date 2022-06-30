@@ -55,12 +55,12 @@ export const actionsMixin = {
       this.setPageNameOnVuex(newRoute);
       this.$router.push(newRoute);
     },
+    /**
+     * This method calls some repeated methods like setEndPointString, setPageName and call the API using setCharactersAsync method.
+     * @param { endPointString, pageName = ""}  store 
+     */
     async setAllActions(store) {
-      const {
-        /*favoriteCharacters = [], selectedCharacter = {}, */ endPointString,
-        pageName = "",
-      } = store;
-      console.log("store ", store);
+      const { endPointString, pageName = ""} = store;
       this.setEndPointStringOnVuex(endPointString);
       this.setPageNameOnVuex(pageName);
       await this.setCharactersAsync(endPointString);
@@ -73,7 +73,7 @@ export const actionsMixin = {
       this.$store.dispatch("setCharacters", characters);
     },
     /**
-     * setGenderOnVuex() : void
+     * setlinkFilterrOnVuex() : void
      * @param linkFilter : linkFilter
      */
     setlinkFilterrOnVuex(linkFilter) {
@@ -117,7 +117,7 @@ export const actionsMixin = {
     /** Othher functions */
     /**
      * openModal() : void
-     * Emit event 'openModal' to the parent to open the modal.
+     * Define setSelectedCharacter variable to show the modal after 0.3 second (For animation).
      */
     openModal() {
       this.setSelectedCharacterOnVuex({}); // Close the modal
@@ -133,6 +133,10 @@ export const actionsMixin = {
       if (this.pageNameFromVuex !== this.homeDirectoryPath) return;
       await this.searchCharacterByText();
     },
+    /**
+     * This method is used to reset linkFilter to its original value.
+     * resetLinkFilter() : void
+     */
     resetLinkFilter() {
       const linkFilter = {
         filterName: "Gender",
@@ -189,7 +193,6 @@ export const actionsMixin = {
             qtyOfCharacters++;
           }
         }
-        console.log("cantidad de ids ", idCharacters.length);
         let stringFilters = `/character/${idCharacters}`;
         const store = {
           endPointString: stringFilters,
